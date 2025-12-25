@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import personService from "./service";
 
 const Filter = (props) => (
   <div>
@@ -48,8 +48,8 @@ const App = () => {
 
   // Initialize list of persons from server at first render
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    personService.getAll().then((response) => {
+      setPersons(response);
     });
   }, []);
 
@@ -71,14 +71,12 @@ const App = () => {
     };
 
     // Send POST request to add the new person
-    axios
-      .post("http://localhost:3001/persons", personObject)
-      .then((response) => {
-        // Update the persons state and reset the newName and newNumber states
-        setPersons(persons.concat(response.data));
-        setNewName("");
-        setNewNumber("");
-      });
+    personService.create(personObject).then((response) => {
+      // Update the persons state and reset the newName and newNumber states
+      setPersons(persons.concat(response));
+      setNewName("");
+      setNewNumber("");
+    });
   };
 
   const handleNewNameChange = (event) => {
