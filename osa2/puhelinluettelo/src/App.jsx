@@ -24,16 +24,25 @@ const PersonForm = (props) => (
 const Persons = (props) => (
   <div>
     {props.persons.map((person) => (
-      <Person key={person.name} person={person} />
+      <Person key={person.name} person={person} onDelete={props.onDelete} />
     ))}
   </div>
 );
 
-const Person = (props) => (
-  <p>
-    {props.person.name} {props.person.number}
-  </p>
-);
+const Person = (props) => {
+  const handleDeleteClick = () => {
+    if (window.confirm(`Delete ${props.person.name}?`)) {
+      props.onDelete(props.person);
+    }
+  };
+
+  return (
+    <p>
+      {props.person.name} {props.person.number}{" "}
+      <button onClick={handleDeleteClick}>delete</button>
+    </p>
+  );
+};
 
 const App = () => {
   // State for the list of persons
@@ -111,6 +120,11 @@ const App = () => {
         persons={persons.filter((person) =>
           person.name.toLowerCase().includes(filter.toLowerCase())
         )}
+        onDelete={(person) => {
+          personService.remove(person.id).then(() => {
+            setPersons(persons.filter((p) => p.id !== person.id));
+          });
+        }}
       />
     </div>
   );
