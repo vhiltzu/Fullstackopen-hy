@@ -44,6 +44,46 @@ const Person = (props) => {
   );
 };
 
+const Notification = (props) => {
+  if (props.kind === "error") {
+    return (
+      <div
+        style={{
+          color: "red",
+          background: "lightgrey",
+          fontSize: "1.5em",
+          padding: "0.33em",
+          border: "2px solid red",
+          borderRadius: "0.33em",
+          margin: "0.5em 0",
+        }}
+      >
+        {props.message}
+      </div>
+    );
+  }
+
+  if (props.kind === "success") {
+    return (
+      <div
+        style={{
+          color: "green",
+          background: "lightgrey",
+          fontSize: "1.5em",
+          padding: "0.33em",
+          border: "2px solid green",
+          borderRadius: "0.33em",
+          margin: "0.5em 0",
+        }}
+      >
+        {props.message}
+      </div>
+    );
+  }
+
+  return null;
+};
+
 const App = () => {
   // State for the list of persons
   const [persons, setPersons] = useState([]);
@@ -54,6 +94,9 @@ const App = () => {
 
   // State for the filter input field
   const [filter, setFilter] = useState("");
+
+  // State for notifications
+  const [notification, setNotification] = useState({ message: "", kind: "" });
 
   // Initialize list of persons from server at first render
   useEffect(() => {
@@ -92,6 +135,10 @@ const App = () => {
       setPersons(persons.concat(response));
       setNewName("");
       setNewNumber("");
+      setNotification({
+        message: `Added ${personObject.name}`,
+        kind: "success",
+      });
     });
   };
 
@@ -104,6 +151,12 @@ const App = () => {
       setPersons(
         persons.map((person) => (person.id === id ? updatedPerson : person))
       );
+      setNewName("");
+      setNewNumber("");
+      setNotification({
+        message: `Updated ${updatedPerson.name}'s number`,
+        kind: "success",
+      });
     });
   };
 
@@ -125,12 +178,17 @@ const App = () => {
   const handleDeletePerson = (person) => {
     personService.remove(person.id).then(() => {
       setPersons(persons.filter((p) => p.id !== person.id));
+      setNotification({
+        message: `Deleted ${person.name}`,
+        kind: "success",
+      });
     });
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification.message} kind={notification.kind} />
       <Filter filter={filter} onChange={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
