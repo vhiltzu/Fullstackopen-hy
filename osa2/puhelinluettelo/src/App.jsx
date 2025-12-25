@@ -7,6 +7,13 @@ const App = () => {
   const handleAddPerson = (event) => {
     event.preventDefault();
 
+    // Check for duplicate names
+    const exists = persons.find((person) => person.name === newName);
+    if (exists) {
+      alert(`${newName} is already added to phonebook`);
+      return;
+    }
+
     // Create a new person object
     const personObject = {
       name: newName,
