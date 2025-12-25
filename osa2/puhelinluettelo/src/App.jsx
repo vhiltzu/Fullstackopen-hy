@@ -66,13 +66,19 @@ const App = () => {
     // Create a new person object
     const personObject = {
       name: newName,
+      id: persons.length + 1, // Simple id generation for now
       number: newNumber,
     };
 
-    // Update the persons state and reset the newName state
-    setPersons(persons.concat(personObject));
-    setNewName("");
-    setNewNumber("");
+    // Send POST request to add the new person
+    axios
+      .post("http://localhost:3001/persons", personObject)
+      .then((response) => {
+        // Update the persons state and reset the newName and newNumber states
+        setPersons(persons.concat(response.data));
+        setNewName("");
+        setNewNumber("");
+      });
   };
 
   const handleNewNameChange = (event) => {
