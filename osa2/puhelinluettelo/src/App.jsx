@@ -24,16 +24,25 @@ const PersonForm = (props) => (
 const Persons = (props) => (
   <div>
     {props.persons.map((person) => (
-      <Person key={person.name} person={person} />
+      <Person key={person.name} person={person} onDelete={props.onDelete} />
     ))}
   </div>
 );
 
-const Person = (props) => (
-  <p>
-    {props.person.name} {props.person.number}
-  </p>
-);
+const Person = (props) => {
+  const handleDeleteClick = () => {
+    if (window.confirm(`Delete ${props.person.name}?`)) {
+      props.onDelete(props.person);
+    }
+  };
+
+  return (
+    <p>
+      {props.person.name} {props.person.number}{" "}
+      <button onClick={handleDeleteClick}>delete</button>
+    </p>
+  );
+};
 
 const App = () => {
   // State for the list of persons
@@ -59,7 +68,14 @@ const App = () => {
     // Check for duplicate names
     const exists = persons.find((person) => person.name === newName);
     if (exists) {
-      alert(`${newName} is already added to phonebook`);
+      // Confirm if the user wants to update the number
+      const shouldUpdate = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      );
+
+      if (shouldUpdate) {
+        updatePersonNumber(exists.id, newNumber);
+      }
       return;
     }
 
@@ -79,6 +95,18 @@ const App = () => {
     });
   };
 
+  const updatePersonNumber = (id, newNumber) => {
+    const person = persons.find((p) => p.id === id);
+    const updatedPersonObject = { ...person, number: newNumber };
+
+    // Send PUT request to update the person's number
+    personService.update(id, updatedPersonObject).then((updatedPerson) => {
+      setPersons(
+        persons.map((person) => (person.id === id ? updatedPerson : person))
+      );
+    });
+  };
+
   const handleNewNameChange = (event) => {
     // Track the value of the input field
     setNewName(event.target.value);
@@ -92,6 +120,12 @@ const App = () => {
   const handleFilterChange = (event) => {
     // Track the value of the filter input field
     setFilter(event.target.value);
+  };
+
+  const handleDeletePerson = (person) => {
+    personService.remove(person.id).then(() => {
+      setPersons(persons.filter((p) => p.id !== person.id));
+    });
   };
 
   return (
@@ -111,6 +145,7 @@ const App = () => {
         persons={persons.filter((person) =>
           person.name.toLowerCase().includes(filter.toLowerCase())
         )}
+        onDelete={handleDeletePerson}
       />
     </div>
   );
