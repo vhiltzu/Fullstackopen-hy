@@ -1,5 +1,39 @@
 import { useState } from "react";
 
+const Filter = (props) => (
+  <div>
+    filter shown with <input value={props.filter} onChange={props.onChange} />
+  </div>
+);
+
+const PersonForm = (props) => (
+  <form onSubmit={props.onSubmit}>
+    <div>
+      name: <input value={props.newName} onChange={props.onNameChange} />
+    </div>
+    <div>
+      number: <input value={props.newNumber} onChange={props.onNumberChange} />
+    </div>
+    <div>
+      <button type="submit">add</button>
+    </div>
+  </form>
+);
+
+const Persons = (props) => (
+  <div>
+    {props.persons.map((person) => (
+      <Person key={person.name} person={person} />
+    ))}
+  </div>
+);
+
+const Person = (props) => (
+  <p>
+    {props.person.name} {props.person.number}
+  </p>
+);
+
 const App = () => {
   // State for the list of persons
   const [persons, setPersons] = useState([
@@ -56,33 +90,21 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input value={filter} onChange={handleFilterChange} />
-      </div>
-      <h2>add a new</h2>
-      <form onSubmit={handleAddPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNewNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNewNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter filter={filter} onChange={handleFilterChange} />
+      <h2>Add a new</h2>
+      <PersonForm
+        onSubmit={handleAddPerson}
+        newName={newName}
+        onNameChange={handleNewNameChange}
+        newNumber={newNumber}
+        onNumberChange={handleNewNumberChange}
+      />
       <h2>Numbers</h2>
-      <div>
-        {persons
-          .filter((person) =>
-            person.name.toLowerCase().includes(filter.toLowerCase())
-          )
-          .map((person) => (
-            <p key={person.name}>
-              {person.name} {person.number}
-            </p>
-          ))}
-      </div>
+      <Persons
+        persons={persons.filter((person) =>
+          person.name.toLowerCase().includes(filter.toLowerCase())
+        )}
+      />
     </div>
   );
 };
