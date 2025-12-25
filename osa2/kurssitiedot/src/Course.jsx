@@ -1,19 +1,3 @@
-import Header from "../Header";
-import Content from "./Course/Content";
-import Total from "./Course/Total";
-
-const Course = (props) => {
-  return (
-    <div>
-      <Header course={props.course.name} />
-      <Content parts={props.course.parts} />
-      <Total parts={props.course.parts} />
-    </div>
-  );
-};
-
-export default Course;
-
 const Header = (props) => {
   return <h1>{props.course}</h1>;
 };
@@ -51,4 +35,14 @@ const Total = (props) => {
   );
 };
 
-export { Header, Content, Part, Total };
+const Course = (props) => {
+  return (
+    <div>
+      <Header course={props.course.name} />
+      <Content parts={props.course.parts} />
+      <Total parts={props.course.parts} />
+    </div>
+  );
+};
+
+export default Course;

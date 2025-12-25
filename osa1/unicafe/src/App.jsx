@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import Statistics from "./Statistics";
-import Button from "./Button";
+import { useState } from "react";
 
 const Button = (props) => {
   return <button onClick={props.onClick}>{props.text}</button>;
@@ -67,6 +65,6 @@ const App = () => {
       <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   );
-}
+};
 
-export default App
+export default App;
