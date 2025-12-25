@@ -6,7 +6,6 @@ const Statistics = (props) => {
 
   return (
     <div>
-      <h1>statistics</h1>
       <div>good {props.good}</div>
       <div>neutral {props.neutral}</div>
       <div>bad {props.bad}</div>
