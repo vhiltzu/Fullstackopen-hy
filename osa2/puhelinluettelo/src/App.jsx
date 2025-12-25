@@ -68,7 +68,14 @@ const App = () => {
     // Check for duplicate names
     const exists = persons.find((person) => person.name === newName);
     if (exists) {
-      alert(`${newName} is already added to phonebook`);
+      // Confirm if the user wants to update the number
+      const shouldUpdate = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      );
+
+      if (shouldUpdate) {
+        updatePersonNumber(exists.id, newNumber);
+      }
       return;
     }
 
@@ -85,6 +92,18 @@ const App = () => {
       setPersons(persons.concat(response));
       setNewName("");
       setNewNumber("");
+    });
+  };
+
+  const updatePersonNumber = (id, newNumber) => {
+    const person = persons.find((p) => p.id === id);
+    const updatedPersonObject = { ...person, number: newNumber };
+
+    // Send PUT request to update the person's number
+    personService.update(id, updatedPersonObject).then((updatedPerson) => {
+      setPersons(
+        persons.map((person) => (person.id === id ? updatedPerson : person))
+      );
     });
   };
 
