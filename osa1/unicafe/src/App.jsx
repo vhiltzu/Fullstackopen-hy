@@ -3,21 +3,22 @@ import Statistics from "./Statistics";
 import Button from "./Button";
 
 const App = () => {
-  const [good, setGood] = useState(0)
-  const [neutral, setNeutral] = useState(0)
-  const [bad, setBad] = useState(0)
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
+  // Maybe these handlers could be in button component itself and passed the state setters as props...
   const handleGoodFeedbackClick = () => {
-    setGood(good + 1)
-  }
+    setGood(good + 1);
+  };
 
   const handleNeutralFeedbackClick = () => {
-    setNeutral(neutral + 1)
-  }
-  
+    setNeutral(neutral + 1);
+  };
+
   const handleBadFeedbackClick = () => {
-    setBad(bad + 1)
-  }
+    setBad(bad + 1);
+  };
 
   return (
     <div>
