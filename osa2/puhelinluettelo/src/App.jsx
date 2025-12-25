@@ -122,6 +122,12 @@ const App = () => {
     setFilter(event.target.value);
   };
 
+  const handleDeletePerson = (person) => {
+    personService.remove(person.id).then(() => {
+      setPersons(persons.filter((p) => p.id !== person.id));
+    });
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -139,11 +145,7 @@ const App = () => {
         persons={persons.filter((person) =>
           person.name.toLowerCase().includes(filter.toLowerCase())
         )}
-        onDelete={(person) => {
-          personService.remove(person.id).then(() => {
-            setPersons(persons.filter((p) => p.id !== person.id));
-          });
-        }}
+        onDelete={handleDeletePerson}
       />
     </div>
   );
