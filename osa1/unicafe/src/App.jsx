@@ -1,6 +1,41 @@
-import { useState } from 'react'
-import Statistics from "./Statistics";
-import Button from "./Button";
+import { useState } from "react";
+
+const Button = (props) => {
+  return <button onClick={props.onClick}>{props.text}</button>;
+};
+
+const StatisticLine = (props) => {
+  return (
+    <tr>
+      <td>{props.text}</td>
+      <td>{props.value}</td>
+    </tr>
+  );
+};
+
+const Statistics = (props) => {
+  const all = props.good + props.bad * -1; // good = 1, neutral = 0, bad = -1
+  const avg = all / (props.good + props.neutral + props.bad);
+  const positive =
+    (props.good / (props.good + props.neutral + props.bad)) * 100;
+
+  if (all === 0) {
+    return <div>No feedback given</div>;
+  }
+
+  return (
+    <table>
+      <tbody>
+        <StatisticLine text="good" value={props.good} />
+        <StatisticLine text="neutral" value={props.neutral} />
+        <StatisticLine text="bad" value={props.bad} />
+        <StatisticLine text="all" value={all} />
+        <StatisticLine text="average" value={avg} />
+        <StatisticLine text="positive" value={positive + " %"} />
+      </tbody>
+    </table>
+  );
+};
 
 const App = () => {
   const [good, setGood] = useState(0);
@@ -30,6 +65,6 @@ const App = () => {
       <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   );
-}
+};
 
-export default App
+export default App;
