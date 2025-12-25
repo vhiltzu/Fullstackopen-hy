@@ -125,7 +125,7 @@ const App = () => {
     // Create a new person object
     const personObject = {
       name: newName,
-      id: persons.length + 1, // Simple id generation for now
+      id: (persons.length + 1).toString(), // Simple id generation for now
       number: newNumber,
     };
 
@@ -176,13 +176,21 @@ const App = () => {
   };
 
   const handleDeletePerson = (person) => {
-    personService.remove(person.id).then(() => {
-      setPersons(persons.filter((p) => p.id !== person.id));
-      setNotification({
-        message: `Deleted ${person.name}`,
-        kind: "success",
+    personService
+      .remove(person.id)
+      .then(() => {
+        setPersons(persons.filter((p) => p.id !== person.id));
+        setNotification({
+          message: `Deleted ${person.name}`,
+          kind: "success",
+        });
+      })
+      .catch(() => {
+        setNotification({
+          message: `Information of ${person.name} has already been removed from server`,
+          kind: "error",
+        });
       });
-    });
   };
 
   return (
