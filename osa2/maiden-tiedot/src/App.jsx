@@ -9,6 +9,10 @@ const Filter = (props) => (
 
 const CountryList = (props) => {
   // Exactly one country
+  if (props.selectedCountry) {
+    return <CountryDetails country={props.selectedCountry} />;
+  }
+
   if (props.countries.length === 1) {
     return <CountryDetails country={props.countries[0]} />;
   }
@@ -18,7 +22,11 @@ const CountryList = (props) => {
     return (
       <div>
         {props.countries.map((country) => (
-          <div key={country.name.common}>{country.name.common}</div>
+          <CountryListItem
+            key={country.name.common}
+            name={country.name.common}
+            onSelect={() => props.onSelect(country)}
+          />
         ))}
       </div>
     );
@@ -28,7 +36,19 @@ const CountryList = (props) => {
   return <div>Too many matches, specify another filter</div>;
 };
 
+const CountryListItem = (props) => {
+  return (
+    <div>
+      {props.name} <button onClick={props.onSelect}>show</button>
+    </div>
+  );
+};
+
 const CountryDetails = (props) => {
+  if (!props.country) {
+    return null;
+  }
+
   const languages = Object.values(props.country.languages);
 
   return (
@@ -55,31 +75,49 @@ const App = () => {
   // State for the filter input field
   const [filter, setFilter] = useState("");
 
-  // State for the list of countries
+  // State for the countries
   const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   // Initialize list of persons from server at first render
   useEffect(() => {
     // Fetch data from server
-    service.getAll().then((countries) => {
-      setCountries(countries);
+    service.getAll().then((response) => {
+      setCountries(response);
     });
   }, []);
 
+  // Handle filter input field changes
   const handleFilterChange = (event) => {
-    setFilter(event.target.value);
+    const newFilter = event.target.value;
+    setFilter(newFilter);
+    setSelectedCountry(null);
   };
 
-  const countriesToShow = countries.filter(
-    (country) =>
-      !!filter &&
-      country.name.common.toLowerCase().includes(filter.toLowerCase())
-  );
+  // Handle country selection from the list
+  const handleCountrySelect = (country) => {
+    setSelectedCountry(country);
+  };
+
+  // Find countries by name
+  const findCountriesByName = (name) => {
+    if (!filter) {
+      return [];
+    }
+
+    return countries.filter((country) =>
+      country.name.common.toLowerCase().includes(name.toLowerCase())
+    );
+  };
 
   return (
     <div>
       <Filter filter={filter} onChange={handleFilterChange} />
-      <CountryList countries={countriesToShow} />
+      <CountryList
+        selectedCountry={selectedCountry}
+        countries={findCountriesByName(filter)}
+        onSelect={handleCountrySelect}
+      />
     </div>
   );
 };
