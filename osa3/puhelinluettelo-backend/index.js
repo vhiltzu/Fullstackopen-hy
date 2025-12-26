@@ -35,6 +35,26 @@ app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
 
+app.get("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+
+  // Check if id is a number
+  if (isNaN(id)) {
+    response.status(400).send({ error: "malformatted id" });
+    return;
+  }
+
+  const person = persons.find((person) => person.id === id);
+
+  // If person not found, return 404
+  if (!person) {
+    response.status(404).end();
+    return;
+  }
+
+  response.json(person);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
