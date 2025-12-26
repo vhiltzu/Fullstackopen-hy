@@ -57,11 +57,29 @@ app.get("/api/persons/:id", (request, response) => {
 app.post("/api/persons", express.json(), (request, response) => {
   const body = request.body;
 
+  // Validate name and number
+  if (!body.name) {
+    return response.status(400).json({ error: "name missing" });
+  }
+
+  if (!body.number) {
+    return response.status(400).json({ error: "number missing" });
+  }
+
+  // Check for unique name
+  const nameExists = persons.find((person) => person.name === body.name);
+  if (nameExists) {
+    return response.status(400).json({ error: "name must be unique" });
+  }
+
+  // Create new person object
   const newPerson = {
     id: Math.ceil(Math.random() * 10 ** 9),
     name: body.name,
     number: body.number,
   };
+
+  // Here could be a check to ensure the id is unique, but the chance of collision is very low
 
   persons.push(newPerson);
   response.status(201).json(newPerson);
