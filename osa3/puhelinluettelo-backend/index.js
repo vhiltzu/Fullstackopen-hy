@@ -1,5 +1,5 @@
 const express = require("express");
-const app = express();
+const morgan = require("morgan");
 
 const persons = [
   {
@@ -23,6 +23,16 @@ const persons = [
     number: "39-23-6423123",
   },
 ];
+
+const app = express();
+
+morgan.token("req-body", (req, res) => JSON.stringify(req.body));
+
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :req-body"
+  )
+);
 
 app.get("/info", (request, response) => {
   response.send(
