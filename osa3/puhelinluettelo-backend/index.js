@@ -24,7 +24,6 @@ const persons = [
   },
 ];
 
-
 app.get("/info", (request, response) => {
   response.send(
     `Phonebook has info for ${persons.length} people<br/><br/>${new Date()}`
@@ -53,6 +52,27 @@ app.get("/api/persons/:id", (request, response) => {
   }
 
   response.json(person);
+});
+
+app.delete("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+
+  // Check if id is a number
+  if (isNaN(id)) {
+    response.status(400).send({ error: "malformatted id" });
+    return;
+  }
+
+  const i = persons.findIndex((person) => person.id === id);
+
+  // If person not found, return 404
+  if (i === -1) {
+    response.status(404).end();
+    return;
+  }
+
+  persons.splice(i, 1);
+  response.status(204).end();
 });
 
 const PORT = 3001;
