@@ -54,6 +54,19 @@ app.get("/api/persons/:id", (request, response) => {
   response.json(person);
 });
 
+app.post("/api/persons", express.json(), (request, response) => {
+  const body = request.body;
+
+  const newPerson = {
+    id: Math.ceil(Math.random() * 10 ** 9),
+    name: body.name,
+    number: body.number,
+  };
+
+  persons.push(newPerson);
+  response.status(201).json(newPerson);
+});
+
 app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
 
