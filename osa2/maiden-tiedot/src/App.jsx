@@ -9,12 +9,8 @@ const Filter = (props) => (
 
 const CountryList = (props) => {
   // Exactly one country
-  if (props.selectedCountry) {
-    return <CountryDetails country={props.selectedCountry} />;
-  }
-
   if (props.countries.length === 1) {
-    return <CountryDetails country={props.countries[0]} />;
+    return null;
   }
 
   // Up to 10 countries
@@ -57,16 +53,54 @@ const CountryDetails = (props) => {
       <div>Capital {props.country.capital.join(", ")}</div>
       <div>Area {props.country.area}</div>
       <h3>Languages</h3>
-      <ul>
-        {languages.map((language) => (
-          <li key={language}>{language}</li>
-        ))}
-      </ul>
+      <CountryLanguages languages={languages} />
+      <CountryFlag country={props.country} />
+      <CapitalWeather
+        capital={props.country.capital[0]}
+        weather={props.weather}
+      />
+    </div>
+  );
+};
+
+const CountryLanguages = (props) => {
+  return (
+    <ul>
+      {props.languages.map((language) => (
+        <li key={language}>{language}</li>
+      ))}
+    </ul>
+  );
+};
+
+const CountryFlag = (props) => {
+  return (
+    <div>
       <img
         src={props.country.flags.svg}
         alt={props.country.flags.alt}
         width="200"
       />
+    </div>
+  );
+};
+
+const CapitalWeather = (props) => {
+  if (!props.weather) {
+    return null;
+  }
+
+  return (
+    <div>
+      <h3>Weather in {props.capital}</h3>
+      <div>Temperature {props.weather.main.temp} Celsius</div>
+      <div>
+        <img
+          src={`http://openweathermap.org/img/wn/${props.weather.weather[0].icon}@2x.png`}
+          alt={props.weather.weather[0].description}
+        />
+      </div>
+      <div>Wind {props.weather.wind.speed} m/s</div>
     </div>
   );
 };
@@ -78,6 +112,7 @@ const App = () => {
   // State for the countries
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedCountryWeather, setSelectedCountryWeather] = useState(null);
 
   // Initialize list of persons from server at first render
   useEffect(() => {
@@ -91,7 +126,18 @@ const App = () => {
   const handleFilterChange = (event) => {
     const newFilter = event.target.value;
     setFilter(newFilter);
+
+    const matchedCountries = findCountriesByName(newFilter);
+
+    // If exactly one country matches, select it
+    if (matchedCountries.length === 1) {
+      setSelectedCountry(matchedCountries[0]);
+      fetchWeatherForCountry(matchedCountries[0]);
+      return;
+    }
+
     setSelectedCountry(null);
+    setSelectedCountryWeather(null);
   };
 
   // Handle country selection from the list
@@ -110,14 +156,35 @@ const App = () => {
     );
   };
 
+  // Get current weather for selected country
+  const fetchWeatherForCountry = (country) => {
+    if (!country || !country.capital || country.capital.length === 0) {
+      return null;
+    }
+
+    const capital = country.capital[0];
+
+    service.getWeatherForCity(capital).then((weather) => {
+      setSelectedCountryWeather(weather);
+    });
+  };
+
+  const filteredCountries = findCountriesByName(filter);
+
   return (
     <div>
       <Filter filter={filter} onChange={handleFilterChange} />
       <CountryList
         selectedCountry={selectedCountry}
-        countries={findCountriesByName(filter)}
+        countries={filteredCountries}
         onSelect={handleCountrySelect}
       />
+      {selectedCountry && (
+        <CountryDetails
+          country={selectedCountry}
+          weather={selectedCountryWeather}
+        />
+      )}
     </div>
   );
 };
