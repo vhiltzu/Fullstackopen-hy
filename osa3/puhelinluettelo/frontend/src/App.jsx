@@ -139,6 +139,12 @@ const App = () => {
         message: `Added ${personObject.name}`,
         kind: "success",
       });
+    })
+    .catch((error) => {
+      setNotification({
+        message: error.response.data.error,
+        kind: "error",
+      });
     });
   };
 
