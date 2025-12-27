@@ -1,6 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const Person = require("./person");
+
+require("dotenv").config();
 
 const persons = [
   {
@@ -25,6 +28,7 @@ const persons = [
   },
 ];
 
+// Initialize express app
 const app = express();
 
 // Middleware for logging
@@ -48,21 +52,15 @@ app.get("/info", (request, response) => {
 });
 
 // Get all persons
-app.get("/api/persons", (request, response) => {
-  response.json(persons);
-});
+app.get("/api/persons", (request, response) =>
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  })
+);
 
 // Get person by ID
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-
-  // Check if id is a number
-  if (isNaN(id)) {
-    response.status(400).send({ error: "malformatted id" });
-    return;
-  }
-
-  const person = persons.find((person) => person.id === id);
+  const person = Person.find((p) => p.id === request.params.id);
 
   // If person not found, return 404
   if (!person) {
@@ -128,7 +126,7 @@ app.delete("/api/persons/:id", (request, response) => {
 });
 
 // Start the server
-const PORT = 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
