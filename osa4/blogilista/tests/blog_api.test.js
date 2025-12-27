@@ -76,6 +76,17 @@ test("all blogs are returned", async () => {
   assert.strictEqual(response.body.length, initialBlogs.length);
 });
 
+test("returned blogs should have id, not _id", async () => {
+  const response = await api.get("/api/blogs");
+
+  // Check that none of the returned blogs have _id and all have id
+  const hasInternalIds = response.body.some((e) => e._id);
+  const hasExternalIds = response.body.every((e) => e.id);
+
+  assert.strictEqual(hasInternalIds, false);
+  assert.strictEqual(hasExternalIds, true);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
