@@ -77,52 +77,62 @@ app.post("/api/persons", express.json(), (request, response) => {
 
   // Validate name and number
   if (!body.name) {
-    return response.status(400).json({ error: "name missing" });
+    response.status(400).json({ error: "name missing" });
+    return;
   }
 
   if (!body.number) {
-    return response.status(400).json({ error: "number missing" });
+    response.status(400).json({ error: "number missing" });
+    return;
   }
 
   // Check for unique name
-  const nameExists = persons.find((person) => person.name === body.name);
-  if (nameExists) {
-    return response.status(400).json({ error: "name must be unique" });
+  Person.findOne({ name: body.name }).then((existingPerson) => {
+    if (existingPerson !== null) {
+      response.status(400).json({ error: "name must be unique" });
+      return;
+    }
+
+    // Create new person object
+    const newPerson = new Person({
+      name: body.name,
+      number: body.number,
+    });
+
+    newPerson.save().then((savedPerson) => {
+      response.status(201).json(savedPerson);
+    });
+  });
+});
+
+// Update an existing person
+app.put("/api/persons/:id", express.json(), (request, response) => {
+  const body = request.body;
+
+  // Validate number
+  if (!body.number) {
+    response.status(400).json({ error: "number missing" });
+    return;
   }
 
-  // Create new person object
-  const newPerson = {
-    id: Math.ceil(Math.random() * 10 ** 9),
-    name: body.name,
-    number: body.number,
-  };
-
-  // Here could be a check to ensure the id is unique, but the chance of collision is very low
-
-  persons.push(newPerson);
-  response.status(201).json(newPerson);
+  // Check for unique name
+  Person.findByIdAndUpdate(
+    request.params.id,
+    { number: body.number },
+    { new: true }
+  ).then((updatedPerson) => {
+    if (updatedPerson !== null) {
+      response.status(201).json(updatedPerson);
+      return;
+    }
+  });
 });
 
 // Delete person by ID
 app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-
-  // Check if id is a number
-  if (isNaN(id)) {
-    response.status(400).send({ error: "malformatted id" });
-    return;
-  }
-
-  const i = persons.findIndex((person) => person.id === id);
-
-  // If person not found, return 404
-  if (i === -1) {
-    response.status(404).end();
-    return;
-  }
-
-  persons.splice(i, 1);
-  response.status(204).end();
+  Person.findByIdAndDelete(request.params.id).then((result) => {
+    response.status(204).end();
+  });
 });
 
 // Start the server
