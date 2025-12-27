@@ -17,6 +17,17 @@ const favoriteBlog = (blogs) => {
   return blogs.reduce(mostLiked, blogs[0]);
 };
 
+// Helper function to find author with most blogs
+const findTopAuthor = (blogsByAuthor) => {
+  // Find the maximum count of blogs
+  const maxCountAuthor = Math.max(...Object.values(blogsByAuthor));
+
+  // Find the author with the maximum count of blogs
+  return Object.entries(blogsByAuthor).find(
+    ([_, count]) => count === maxCountAuthor
+  );
+};
+
 const mostBlogs = (blogs) => {
   const incrementCountForAuthor = (counts, blog) => {
     return { ...counts, [blog.author]: (counts[blog.author] || 0) + 1 };
@@ -25,22 +36,42 @@ const mostBlogs = (blogs) => {
   // Count number of blogs for each author
   const authorBlogCount = blogs.reduce(incrementCountForAuthor, {});
 
-  // Find the maximum count of blogs
-  const maxCountAuthor = Math.max(...Object.values(authorBlogCount));
-
-  // Find the author with the maximum count of blogs
-  const authorWithMostBlogs = Object.entries(authorBlogCount).find(
-    ([_, count]) => count === maxCountAuthor
-  );
+  // Find the author with the most blogs
+  const topAuthor = findTopAuthor(authorBlogCount);
 
   // If no author found, return undefined
-  if (!authorWithMostBlogs) {
+  if (!topAuthor) {
     return undefined;
   }
 
   return {
-    author: authorWithMostBlogs[0],
-    blogs: maxCountAuthor,
+    author: topAuthor[0],
+    blogs: topAuthor[1],
+  };
+};
+
+const mostLikes = (blogs) => {
+  const addLikesForAuthor = (likesCount, blog) => {
+    return {
+      ...likesCount,
+      [blog.author]: (likesCount[blog.author] || 0) + blog.likes,
+    };
+  };
+
+  // Sum likes for each author
+  const authorLikesCount = blogs.reduce(addLikesForAuthor, {});
+
+  // Find the author with the most liked blogs
+  const topAuthor = findTopAuthor(authorLikesCount);
+
+  // If no author found, return undefined
+  if (!topAuthor) {
+    return undefined;
+  }
+
+  return {
+    author: topAuthor[0],
+    likes: topAuthor[1],
   };
 };
 
@@ -49,4 +80,5 @@ module.exports = {
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 };
