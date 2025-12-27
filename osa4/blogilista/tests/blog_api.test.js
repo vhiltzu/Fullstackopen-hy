@@ -1,4 +1,4 @@
-const { test, beforeEach, after } = require("node:test");
+const { test, beforeEach, after, describe } = require("node:test");
 const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
@@ -63,53 +63,73 @@ beforeEach(async () => {
   await Blog.insertMany(initialBlogs);
 });
 
-test("blogs are returned as json", async () => {
-  await api
-    .get("/api/blogs")
-    .expect(200)
-    .expect("Content-Type", /application\/json/);
-});
+describe("blog API tests", () => {
+  test("blogs are returned as json", async () => {
+    await api
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+  });
 
-test("all blogs are returned", async () => {
-  const response = await api.get("/api/blogs");
+  test("all blogs are returned", async () => {
+    const response = await api.get("/api/blogs");
 
-  assert.strictEqual(response.body.length, initialBlogs.length);
-});
+    assert.strictEqual(response.body.length, initialBlogs.length);
+  });
 
-test("returned blogs should have id, not _id", async () => {
-  const response = await api.get("/api/blogs");
+  test("returned blogs should have id, not _id", async () => {
+    const response = await api.get("/api/blogs");
 
-  // Check that none of the returned blogs have _id and all have id
-  const hasInternalIds = response.body.some((e) => e._id);
-  const hasExternalIds = response.body.every((e) => e.id);
+    // Check that none of the returned blogs have _id and all have id
+    const hasInternalIds = response.body.some((e) => e._id);
+    const hasExternalIds = response.body.every((e) => e.id);
 
-  assert(!hasInternalIds);
-  assert(hasExternalIds);
-});
+    assert(!hasInternalIds);
+    assert(hasExternalIds);
+  });
 
-test("a valid blog can be added", async () => {
-  const newBlog = {
-    title: "async/await simplifies making async calls",
-    author: "Test Author",
-    url: "http://example.com",
-    likes: 8,
-  };
+  test("a valid blog can be added", async () => {
+    const newBlog = {
+      title: "async/await simplifies making async calls",
+      author: "Test Author",
+      url: "http://example.com",
+      likes: 8,
+    };
 
-  // Add the new blog
-  await api
-    .post("/api/blogs")
-    .send(newBlog)
-    .expect(201)
-    .expect("Content-Type", /application\/json/);
+    // Add the new blog
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
 
-  const response = await api.get("/api/blogs");
-  const contents = response.body.map((r) => r.title);
+    const response = await api.get("/api/blogs");
+    const contents = response.body.map((r) => r.title);
 
-  // Verify that the blog count has increased by one
-  assert.strictEqual(response.body.length, initialBlogs.length + 1);
+    // Verify that the blog count has increased by one
+    assert.strictEqual(response.body.length, initialBlogs.length + 1);
 
-  // Verify that the new blog is among the returned blogs
-  assert(contents.includes("async/await simplifies making async calls"));
+    // Verify that the new blog is among the returned blogs
+    assert(contents.includes("async/await simplifies making async calls"));
+  });
+
+  test("if likes property is missing, it defaults to 0", async () => {
+    const newBlog = {
+      title: "Blog without likes",
+      author: "No Likes Author",
+      url: "http://example.com/nolikes",
+    };
+
+    // Add the new blog
+    const response = await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    // Verify that the likes property defaults to 0
+    assert.strictEqual(response.body.likes, 0);
+  });
 });
 
 after(async () => {
