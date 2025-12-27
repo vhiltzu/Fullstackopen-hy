@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const persons = [
   {
@@ -26,24 +27,30 @@ const persons = [
 
 const app = express();
 
+// Middleware for logging
 morgan.token("req-body", (req, res) => JSON.stringify(req.body));
-
 app.use(
   morgan(
     ":method :url :status :res[content-length] - :response-time ms :req-body"
   )
 );
 
+// Middleware for CORS
+app.use(cors())
+
+// Info endpoint
 app.get("/info", (request, response) => {
   response.send(
     `Phonebook has info for ${persons.length} people<br/><br/>${new Date()}`
   );
 });
 
+// Get all persons
 app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
 
+// Get person by ID
 app.get("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
 
@@ -64,6 +71,7 @@ app.get("/api/persons/:id", (request, response) => {
   response.json(person);
 });
 
+// Create a new person
 app.post("/api/persons", express.json(), (request, response) => {
   const body = request.body;
 
@@ -95,6 +103,7 @@ app.post("/api/persons", express.json(), (request, response) => {
   response.status(201).json(newPerson);
 });
 
+// Delete person by ID
 app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
 
@@ -116,6 +125,7 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
+// Start the server
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
