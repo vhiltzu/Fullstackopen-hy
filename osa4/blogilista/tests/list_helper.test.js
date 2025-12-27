@@ -121,6 +121,9 @@ describe("most blogs", () => {
     assert.deepStrictEqual(result, { author: "Robert C. Martin", blogs: 3 });
   });
 
+  // There could be a corner case test for multiple top authors with same blog count.
+  // The requirements of the exercise do not require handling that case though.
+
   test("when list is empty equals undefined", () => {
     const result = listHelper.mostBlogs([]);
     assert.deepStrictEqual(result, undefined);
@@ -137,6 +140,9 @@ describe("most likes", () => {
     const result = listHelper.mostLikes(blogs);
     assert.deepStrictEqual(result, { author: "Edsger W. Dijkstra", likes: 17 });
   });
+
+  // There could be a corner case test for multiple top authors with same likes.
+  // The requirements of the exercise do not require handling that case though.
 
   test("when list is empty equals undefined", () => {
     const result = listHelper.mostLikes([]);
