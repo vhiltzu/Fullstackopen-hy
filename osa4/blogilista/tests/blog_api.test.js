@@ -130,6 +130,21 @@ describe("blog API tests", () => {
     // Verify that the likes property defaults to 0
     assert.strictEqual(response.body.likes, 0);
   });
+
+    test("blog without title and url is not added", async () => {
+      const newBlog = {
+        author: "Missing Fields Author",
+        likes: 4,
+      };
+
+      // Attempt to add the invalid blog
+      await api.post("/api/blogs").send(newBlog).expect(400);
+
+      const response = await api.get("/api/blogs");
+
+      // Verify that the blog count has not changed
+      assert.strictEqual(response.body.length, initialBlogs.length);
+    });
 });
 
 after(async () => {
