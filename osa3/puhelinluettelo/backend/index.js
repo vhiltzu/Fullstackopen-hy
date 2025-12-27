@@ -36,7 +36,9 @@ app.use(
 );
 
 // Middleware for CORS
-app.use(cors())
+app.use(cors());
+
+app.use(express.static("dist"));
 
 // Info endpoint
 app.get("/info", (request, response) => {
