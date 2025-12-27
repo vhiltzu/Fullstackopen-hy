@@ -83,8 +83,33 @@ test("returned blogs should have id, not _id", async () => {
   const hasInternalIds = response.body.some((e) => e._id);
   const hasExternalIds = response.body.every((e) => e.id);
 
-  assert.strictEqual(hasInternalIds, false);
-  assert.strictEqual(hasExternalIds, true);
+  assert(!hasInternalIds);
+  assert(hasExternalIds);
+});
+
+test("a valid blog can be added", async () => {
+  const newBlog = {
+    title: "async/await simplifies making async calls",
+    author: "Test Author",
+    url: "http://example.com",
+    likes: 8,
+  };
+
+  // Add the new blog
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const response = await api.get("/api/blogs");
+  const contents = response.body.map((r) => r.title);
+
+  // Verify that the blog count has increased by one
+  assert.strictEqual(response.body.length, initialBlogs.length + 1);
+
+  // Verify that the new blog is among the returned blogs
+  assert(contents.includes("async/await simplifies making async calls"));
 });
 
 after(async () => {
