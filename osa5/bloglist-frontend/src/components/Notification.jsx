@@ -4,7 +4,7 @@ const Notification = (props) => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       props.dismiss();
-    }, 3000);
+    }, 5_000);
 
     return () => clearTimeout(timeout);
   }, [props]);
