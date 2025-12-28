@@ -1,13 +1,25 @@
 const blogsRouter = require('express').Router()
 const Blog = require("../models/blog");
+const helper = require("../utils/controller_helper");
 
 blogsRouter.get("/", async (request, response) => {
-  const blog = await Blog.find({});
+  const blog = await Blog.find({}).populate("user");
   response.json(blog);
 });
 
 blogsRouter.post("/", async (request, response) => {
-  const blog = new Blog(request.body);
+  const decodedToken = helper.decryptToken(helper.getTokenFrom(request));
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token invalid" });
+  }
+
+  const user = await helper.findUserFromDecodedToken(decodedToken);
+
+  if (!user) {
+    return response.status(400).json({ error: "UserId missing or not valid" });
+  }
+
+  const blog = new Blog({ ...request.body, user: user._id });
 
   // Validate the blog data
   try {
@@ -18,6 +30,8 @@ blogsRouter.post("/", async (request, response) => {
 
   // Save the new blog to the database
   const savedBlog = await blog.save();
+  user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
   response.status(201).json(savedBlog);
 });
 
