@@ -32,10 +32,10 @@ const App = () => {
     blogService.setToken(user.token)
   }, [])
 
-  const setSortedBlogs = (blogs) => {
-    const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
-    setBlogs(sortedBlogs)
-  }
+  const setSortedBlogs = (bloglist) => {
+    bloglist.sort((a, b) => b.likes - a.likes);
+    setBlogs(bloglist);
+  };
 
   const handleLogin = (event) => {
     event.preventDefault()
