@@ -20,7 +20,7 @@ const App = () => {
   });
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService.getAll().then((blogs) => setSortedBlogs(blogs));
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
 
     if (!loggedUserJSON) {
@@ -31,6 +31,11 @@ const App = () => {
     setUser(user);
     blogService.setToken(user.token);
   }, []);
+
+  const setSortedBlogs = (blogs) => {
+    const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+    setBlogs(sortedBlogs);
+  };
 
   const handleLogin = (event) => {
     event.preventDefault();
@@ -65,7 +70,7 @@ const App = () => {
   const handleNewBlogCreation = (blogObject) => {
     blogService.create(blogObject).then((returnedBlog) => {
       blogFormRef.current.toggleVisibility();
-      setBlogs(blogs.concat(returnedBlog));
+      setSortedBlogs(blogs.concat(returnedBlog));
       setNotification({
         message: `A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`,
         kind: "success",
@@ -87,7 +92,7 @@ const App = () => {
       const i = blogs.findIndex((b) => b.id === id);
       updatedBlogs[i].likes = returnedBlog.likes;
 
-      setBlogs(updatedBlogs);
+      setSortedBlogs(updatedBlogs);
     });
   };
 
