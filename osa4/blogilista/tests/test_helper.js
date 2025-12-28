@@ -1,10 +1,20 @@
-const { Blog } = require("../models/blog");
+const Blog = require('../models/blog')
+const User = require('../models/user')
+const jwt = require("jsonwebtoken");
+
+const sampleUser = {
+  _id: "64a7b2f4f0c2e5b1d6a1e8c9",
+  username: "testuser",
+  name: "Test User",
+  __v: 0,
+};
 
 const mostLikedBlog = {
   _id: "5a422b3a1b54a676234d17f9",
   title: "Canonical string reduction",
   author: "Edsger W. Dijkstra",
   url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+  user: sampleUser._id,
   likes: 12,
   __v: 0,
 };
@@ -15,6 +25,7 @@ const initialBlogs = [
     title: "React patterns",
     author: "Michael Chan",
     url: "https://reactpatterns.com/",
+    user: sampleUser._id,
     likes: 7,
     __v: 0,
   },
@@ -23,6 +34,7 @@ const initialBlogs = [
     title: "Go To Statement Considered Harmful",
     author: "Edsger W. Dijkstra",
     url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+    user: sampleUser._id,
     likes: 5,
     __v: 0,
   },
@@ -32,6 +44,7 @@ const initialBlogs = [
     title: "First class tests",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+    user: sampleUser._id,
     likes: 10,
     __v: 0,
   },
@@ -48,6 +61,7 @@ const initialBlogs = [
     title: "Type wars",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+    user: sampleUser._id,
     likes: 2,
     __v: 0,
   },
@@ -59,6 +73,7 @@ const listWithOneBlog = [
     title: "Go To Statement Considered Harmful",
     author: "Edsger W. Dijkstra",
     url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+    user: sampleUser._id,
     likes: 5,
     __v: 0,
   },
@@ -69,9 +84,32 @@ const blogsInDb = async () => {
   return blogs.map((blog) => blog.toJSON());
 };
 
+const usersInDb = async () => {
+  const users = await User.find({});
+  return users.map((u) => u.toJSON());
+};
+
+const getSampleToken = async () => {
+  const users = await usersInDb();
+  const user = users[0];
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60,
+  });
+
+  return token;
+};
+
 module.exports = {
   initialBlogs,
   mostLikedBlog,
   listWithOneBlog,
   blogsInDb,
+  usersInDb,
+  getSampleToken,
+  sampleUser,
 };

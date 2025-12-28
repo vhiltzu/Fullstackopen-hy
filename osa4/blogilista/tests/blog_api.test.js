@@ -1,15 +1,18 @@
-const { test, beforeEach, after, describe } = require("node:test");
-const assert = require("node:assert");
-const mongoose = require("mongoose");
-const supertest = require("supertest");
-const app = require("../app");
-const { Blog } = require("../models/blog");
-const helper = require("./test_helper");
+const { test, beforeEach, after, describe } = require('node:test')
+const assert = require('node:assert')
+const mongoose = require('mongoose')
+const supertest = require('supertest')
+const app = require('../app')
+const Blog = require('../models/blog')
+const helper = require('./test_helper')
+const User = require("../models/user");
 
 const api = supertest(app);
 
 describe("blog API tests", () => {
   beforeEach(async () => {
+    await User.deleteMany({});
+    await User.insertOne(helper.sampleUser);
     await Blog.deleteMany({});
     await Blog.insertMany(helper.initialBlogs);
   });
@@ -52,6 +55,7 @@ describe("blog API tests", () => {
       // Add the new blog
       await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${await helper.getSampleToken()}`) // Authentication is required
         .send(newBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/);
@@ -77,6 +81,7 @@ describe("blog API tests", () => {
       // Add the new blog
       const response = await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${await helper.getSampleToken()}`) // Authentication is required
         .send(newBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/);
@@ -92,7 +97,11 @@ describe("blog API tests", () => {
       };
 
       // Attempt to add the invalid blog
-      await api.post("/api/blogs").send(newBlog).expect(400);
+      await api
+        .post("/api/blogs")
+        .set("Authorization", `Bearer ${await helper.getSampleToken()}`) // Authentication is required
+        .send(newBlog)
+        .expect(400);
 
       const response = await api.get("/api/blogs").expect(200);
 
@@ -111,13 +120,16 @@ describe("blog API tests", () => {
 
       // Delete the selected blog
       const blogToDelete = blogsAtStart[randomIndex];
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set("Authorization", `Bearer ${await helper.getSampleToken()}`)
+        .expect(204);
 
       // Verify that the blog has been deleted
       const blogsAtEnd = await helper.blogsInDb();
 
-      const contents = blogsAtEnd.map((n) => n.title);
-      assert(!contents.includes(blogToDelete.title));
+      const title = blogsAtEnd.map((n) => n.title);
+      assert(!title.includes(blogToDelete.title));
 
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
     });
@@ -128,17 +140,12 @@ describe("blog API tests", () => {
       // Get the current blogs
       const blogsAtStart = await helper.blogsInDb();
 
-      // Select a random blog to update
-      const randomIndex = Math.floor(Math.random() * blogsAtStart.length);
-
-      // Increase likes by a random number between 1-10
-      const likeAddition = Math.floor(Math.random() * 10) + 1;
-
       // Update random blog with new likes
-      const blogToUpdate = blogsAtStart[randomIndex];
+      const blogToUpdate = blogsAtStart[0];
+      blogToUpdate.likes += 10;
+
       const updatedData = {
         ...blogToUpdate,
-        likes: blogToUpdate.likes + likeAddition,
       };
 
       const response = await api
@@ -148,14 +155,11 @@ describe("blog API tests", () => {
         .expect("Content-Type", /application\/json/);
 
       // Verify that the blog has been updated
-      assert.strictEqual(
-        response.body.likes,
-        blogToUpdate.likes + likeAddition
-      );
+      assert.strictEqual(response.body.likes, blogToUpdate.likes);
     });
   });
 });
 
 after(async () => {
-  await mongoose.connection.close();
-});
+  await mongoose.connection.close()
+})
