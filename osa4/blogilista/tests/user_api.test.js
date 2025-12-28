@@ -61,6 +61,51 @@ describe("user API tests", () => {
     const usernames = usersAtEnd.map((u) => u.username);
     assert(usernames.includes(newUser.username));
   });
+
+  test("creation fails with proper statuscode and message if username is too short", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: "jo",
+      name: "John Doe",
+      password: "salainen",
+    };
+
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    const usersAtEnd = await helper.usersInDb();
+    assert(
+      result.body.error.includes("is shorter than the minimum allowed length")
+    );
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+  });
+
+  test("creation fails with proper statuscode and message if password is too short", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: "johndoe",
+      name: "John Doe",
+      password: "sa",
+    };
+
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+    const usersAtEnd = await helper.usersInDb();
+
+    assert(
+      result.body.error.includes("password must be at least 3 characters long")
+    );
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+  });
 });
 
 after(async () => {
