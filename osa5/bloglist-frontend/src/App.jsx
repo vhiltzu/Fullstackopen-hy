@@ -77,8 +77,17 @@ const App = () => {
     const blog = blogs.find((b) => b.id === id);
     const updatedBlog = { ...blog, likes: blog.likes + 1 };
 
+    // Remove user property to avoid "user field is immutable" error from backend
+    delete updatedBlog.user;
+
     blogService.update(id, updatedBlog).then((returnedBlog) => {
-      setBlogs(blogs.map((b) => (b.id !== id ? b : returnedBlog)));
+      const updatedBlogs = [...blogs];
+
+      // Find index of the updated blog and replace it likes instead of the whole object
+      const i = blogs.findIndex((b) => b.id === id);
+      updatedBlogs[i].likes = returnedBlog.likes;
+
+      setBlogs(updatedBlogs);
     });
   };
 
