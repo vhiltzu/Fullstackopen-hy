@@ -7,6 +7,12 @@ const user = {
   password: "salainen",
 };
 
+const anotherUser = {
+  name: "John Doe",
+  username: "john",
+  password: "secret",
+};
+
 const blog = {
   title: "E2E testing with Playwright",
   author: "Test Author",
@@ -18,6 +24,9 @@ describe("Blog app", () => {
     await request.post("http://localhost:3003/api/testing/reset");
     await request.post("http://localhost:3003/api/users", {
       data: user,
+    });
+    await request.post("http://localhost:3003/api/users", {
+      data: anotherUser,
     });
 
     await page.goto("http://localhost:5173");
@@ -104,6 +113,30 @@ describe("Blog app", () => {
         // Verify that the blog has been removed
         await expect(
           page.getByText(`${blog.title} ${blog.author}`)
+        ).not.toBeVisible();
+      });
+
+      test("only the creator can see the remove button", async ({ page }) => {
+        // Logout current user
+        await page.getByRole("button", { name: "logout" }).click();
+
+        // Login as another user
+        await helpers.loginWith(
+          page,
+          anotherUser.username,
+          anotherUser.password,
+          anotherUser.name
+        );
+
+        // Expand blog details
+        await page
+          .getByText(`${blog.title} ${blog.author}`)
+          .getByRole("button", { name: "view" })
+          .click();
+
+        // Verify that the remove button is not visible
+        await expect(
+          page.getByRole("button", { name: "remove" })
         ).not.toBeVisible();
       });
     });
