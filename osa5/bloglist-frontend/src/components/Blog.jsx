@@ -1,36 +1,36 @@
-import { useState } from "react";
+import { useState } from 'react'
 
 const Blog = ({ blog, canRemove, onLikeClick, onRemove }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
-    border: "solid",
+    border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
-  };
+  }
 
-  const [detailsVisible, setDetailsVisible] = useState(false);
+  const [detailsVisible, setDetailsVisible] = useState(false)
 
-  const showDetailsWhenVisible = { display: detailsVisible ? "" : "none" };
+  const showDetailsWhenVisible = { display: detailsVisible ? '' : 'none' }
 
   const handleLikeClick = () => {
-    onLikeClick(blog);
-  };
+    onLikeClick(blog)
+  }
 
   const handleRemoveClick = () => {
-    onRemove(blog);
-  };
+    onRemove(blog)
+  }
 
   return (
     <div style={blogStyle}>
       {blog.title} {blog.author}
       <button type="button" onClick={() => setDetailsVisible(!detailsVisible)}>
-        {detailsVisible ? "hide" : "view"}
+        {detailsVisible ? 'hide' : 'view'}
       </button>
       <div style={showDetailsWhenVisible} className="blogDetails">
         <p>{blog.url}</p>
         <p>
-          likes {blog.likes}{" "}
+          likes {blog.likes}{' '}
           <button type="button" onClick={handleLikeClick}>
             like
           </button>
@@ -43,7 +43,7 @@ const Blog = ({ blog, canRemove, onLikeClick, onRemove }) => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Blog;
+export default Blog
