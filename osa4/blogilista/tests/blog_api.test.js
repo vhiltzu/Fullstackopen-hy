@@ -106,8 +106,11 @@ describe("blog API tests", () => {
       // Get the current blogs
       const blogsAtStart = await helper.blogsInDb();
 
-      // Delete the first blog
-      const blogToDelete = blogsAtStart[0];
+      // Select a random blog to delete
+      const randomIndex = Math.floor(Math.random() * blogsAtStart.length);
+
+      // Delete the selected blog
+      const blogToDelete = blogsAtStart[randomIndex];
       await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
 
       // Verify that the blog has been deleted
@@ -117,6 +120,38 @@ describe("blog API tests", () => {
       assert(!contents.includes(blogToDelete.title));
 
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
+    });
+  });
+
+  describe("updating a blog", () => {
+    test("succeeds with status code 200 if data is valid", async () => {
+      // Get the current blogs
+      const blogsAtStart = await helper.blogsInDb();
+
+      // Select a random blog to update
+      const randomIndex = Math.floor(Math.random() * blogsAtStart.length);
+
+      // Increase likes by a random number between 1-10
+      const likeAddition = Math.floor(Math.random() * 10) + 1;
+
+      // Update random blog
+      const blogToUpdate = blogsAtStart[randomIndex];
+      const updatedData = {
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + likeAddition,
+      };
+
+      const response = await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedData)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      // Verify that the blog has been updated
+      assert.strictEqual(
+        response.body.likes,
+        blogToUpdate.likes + likeAddition
+      );
     });
   });
 });
