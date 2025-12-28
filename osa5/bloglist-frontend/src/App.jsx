@@ -73,6 +73,15 @@ const App = () => {
     });
   };
 
+  const handleBlogLike = (id) => {
+    const blog = blogs.find((b) => b.id === id);
+    const updatedBlog = { ...blog, likes: blog.likes + 1 };
+
+    blogService.update(id, updatedBlog).then((returnedBlog) => {
+      setBlogs(blogs.map((b) => (b.id !== id ? b : returnedBlog)));
+    });
+  };
+
   const handleNotificationDismiss = () => {
     setNotification({ message: null, kind: null });
   };
@@ -133,7 +142,11 @@ const App = () => {
         <BlogForm createBlog={handleNewBlogCreation} />
       </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          onLikeClick={() => handleBlogLike(blog.id)}
+        />
       ))}
     </div>
   );
