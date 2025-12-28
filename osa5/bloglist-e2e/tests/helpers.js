@@ -14,4 +14,27 @@ const createBlog = async (page, title, author, url) => {
   await page.getByText(`${title} ${author}`).waitFor();
 };
 
-export { loginWith, createBlog };
+// Like the blogs to set different like counts
+const likeBlog = async (page, blogTitle, likes) => {
+    // Expand blog details
+    await page
+    .getByText(blogTitle)
+    .getByRole("button", { name: "view" })
+    .click();
+
+    for (let i = 0; i < likes; i++) {
+    await page
+        .getByText(/likes \d+/)
+        .getByRole("button", { name: "like" })
+        .click();
+    await page.getByText(`likes ${i + 1}`).waitFor();
+    }
+
+    // Hide blog details
+    await page
+    .getByText(blogTitle)
+    .getByRole("button", { name: "hide" })
+    .click();
+};
+
+export { loginWith, createBlog, likeBlog };
