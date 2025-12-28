@@ -139,6 +139,51 @@ describe("Blog app", () => {
           page.getByRole("button", { name: "remove" })
         ).not.toBeVisible();
       });
+
+      test("blogs are ordered by likes in descending order", async ({
+        page,
+      }) => {
+        // Create additional blogs
+        const secondBlog = {
+          title: "Second Blog",
+          author: "Second Author",
+          url: "http://second.com",
+        };
+        const thirdBlog = {
+          title: "Third Blog",
+          author: "Third Author",
+          url: "http://third.com",
+        };
+
+        await helpers.createBlog(
+          page,
+          secondBlog.title,
+          secondBlog.author,
+          secondBlog.url
+        );
+        await helpers.createBlog(
+          page,
+          thirdBlog.title,
+          thirdBlog.author,
+          thirdBlog.url
+        );
+
+        await helpers.likeBlog(page, blog.title, 2); // Original blog gets 2 likes
+        await helpers.likeBlog(page, secondBlog.title, 5); // Second blog gets 5 likes
+        await helpers.likeBlog(page, thirdBlog.title, 3); // Third blog gets 3 likes
+
+        // Verify that the blogs are ordered by likes in descending order
+        const blogEntries = page.locator(".blog");
+        const firstBlogTitle = await blogEntries.nth(0).innerText();
+        const secondBlogTitle = await blogEntries.nth(1).innerText();
+        const thirdBlogTitle = await blogEntries.nth(2).innerText();
+
+        // The second blog should be first, third blog second, original blog third
+        // because likes are 5 > 3 > 2 respectively
+        expect(firstBlogTitle).toContain(secondBlog.title);
+        expect(secondBlogTitle).toContain(thirdBlog.title);
+        expect(thirdBlogTitle).toContain(blog.title);
+      });
     });
   });
 });
