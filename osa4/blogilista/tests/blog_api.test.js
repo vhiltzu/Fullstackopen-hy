@@ -134,7 +134,7 @@ describe("blog API tests", () => {
       // Increase likes by a random number between 1-10
       const likeAddition = Math.floor(Math.random() * 10) + 1;
 
-      // Update random blog
+      // Update random blog with new likes
       const blogToUpdate = blogsAtStart[randomIndex];
       const updatedData = {
         ...blogToUpdate,
