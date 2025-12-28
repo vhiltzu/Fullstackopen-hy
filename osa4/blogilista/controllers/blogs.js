@@ -3,7 +3,11 @@ const Blog = require('../models/blog')
 const helper = require('../utils/controller_helper')
 
 blogsRouter.get('/', async (request, response) => {
-  const blog = await Blog.find({}).populate('user')
+  const blog = await Blog.find({}).populate('user', {
+    username: 1,
+    name: 1,
+    id: 1,
+  })
   response.json(blog)
 })
 
@@ -60,11 +64,12 @@ blogsRouter.put('/:id', async (request, response) => {
     return response.status(400).json({ error: error.message })
   }
 
+  delete request.body.id;
+
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
-    request.body,
-    { new: true, runValidators: true, context: 'query' }
-  )
+    request.body
+  );
   response.json(updatedBlog)
 })
 
