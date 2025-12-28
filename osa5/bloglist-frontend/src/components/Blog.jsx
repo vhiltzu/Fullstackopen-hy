@@ -11,26 +11,39 @@ const Blog = ({ blog, canRemove, onLikeClick, onRemove }) => {
 
   const [detailsVisible, setDetailsVisible] = useState(false)
 
-  const showDetailsWhenVisible = { display: detailsVisible ? '' : 'none' }
+  const toggleDetailsVisibility = () => {
+    setDetailsVisible(!detailsVisible);
+  };
 
   const handleLikeClick = () => {
-    onLikeClick(blog)
-  }
+    onLikeClick(blog);
+  };
 
   const handleRemoveClick = () => {
-    onRemove(blog)
+    onRemove(blog);
+  };
+
+  if (detailsVisible === false) {
+    return (
+      <div style={blogStyle} className="blog">
+        {blog.title} {blog.author}
+        <button type="button" onClick={toggleDetailsVisibility}>
+          view
+        </button>
+      </div>
+    );
   }
 
   return (
     <div style={blogStyle}>
       {blog.title} {blog.author}
-      <button type="button" onClick={() => setDetailsVisible(!detailsVisible)}>
-        {detailsVisible ? 'hide' : 'view'}
+      <button type="button" onClick={toggleDetailsVisibility}>
+        hide
       </button>
-      <div style={showDetailsWhenVisible} className="blogDetails">
+      <div className="blogDetails">
         <p>{blog.url}</p>
         <p>
-          likes {blog.likes}{' '}
+          likes {blog.likes}{" "}
           <button type="button" onClick={handleLikeClick}>
             like
           </button>
@@ -43,7 +56,7 @@ const Blog = ({ blog, canRemove, onLikeClick, onRemove }) => {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export default Blog
