@@ -78,22 +78,41 @@ const App = () => {
     });
   };
 
-  const handleBlogLike = (id) => {
-    const blog = blogs.find((b) => b.id === id);
+  const handleBlogLike = (blog) => {
     const updatedBlog = { ...blog, likes: blog.likes + 1 };
 
     // Make sure the user field is just the user id
-    updatedBlog.user = blog.user.id;
-
-    blogService.update(id, updatedBlog).then((returnedBlog) => {
+    if (blog.user && blog.user.id) {
+      updatedBlog.user = blog.user.id;
+    }
+    blogService.update(blog.id, updatedBlog).then((returnedBlog) => {
       const updatedBlogs = [...blogs];
 
       // Find index of the updated blog and replace it likes instead of the whole object
-      const i = blogs.findIndex((b) => b.id === id);
+      const i = blogs.findIndex((b) => b.id === blog.id);
       updatedBlogs[i].likes = returnedBlog.likes;
 
       setSortedBlogs(updatedBlogs);
     });
+  };
+
+  const handleBlogRemove = (blog) => {
+    const blogToRemove = blogs.find((b) => b.id === blog.id);
+
+    if (
+      window.confirm(
+        `Remove blog "${blogToRemove.title}" by ${blogToRemove.author}?`
+      )
+    ) {
+      blogService.remove(blog.id).then(() => {
+        const updatedBlogs = blogs.filter((b) => b.id !== blog.id);
+        setSortedBlogs(updatedBlogs);
+        setNotification({
+          message: `Blog "${blogToRemove.title}" removed`,
+          kind: "success",
+        });
+      });
+    }
   };
 
   const handleNotificationDismiss = () => {
@@ -159,7 +178,9 @@ const App = () => {
         <Blog
           key={blog.id}
           blog={blog}
-          onLikeClick={() => handleBlogLike(blog.id)}
+          canRemove={user.username === blog.user?.username} // Because there is no id matching available due lack of properties
+          onLikeClick={handleBlogLike}
+          onRemove={handleBlogRemove}
         />
       ))}
     </div>
