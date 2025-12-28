@@ -1,12 +1,12 @@
 const blogsRouter = require('express').Router()
-const { Blog } = require('../models/blog')
+const Blog = require("../models/blog");
 
-blogsRouter.get("", async (request, response) => {
+blogsRouter.get("/", async (request, response) => {
   const blog = await Blog.find({});
   response.json(blog);
 });
 
-blogsRouter.post("", async (request, response) => {
+blogsRouter.post("/", async (request, response) => {
   const blog = new Blog(request.body);
 
   // Validate the blog data
