@@ -72,8 +72,10 @@ blogsRouter.put("/:id", async (request, response) => {
 
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
-    request.body
+    request.body,
+    { returnDocument: "after", runValidators: false }
   );
+
   response.json(updatedBlog);
 });
 
