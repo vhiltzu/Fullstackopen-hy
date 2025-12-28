@@ -12,26 +12,29 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', userExtractor, async (request, response) => {
-  const user = request.user
+  const user = request.user;
 
   if (!user) {
-    return response.status(400).json({ error: 'UserId missing or not valid' })
+    return response.status(400).json({ error: "UserId missing or not valid" });
   }
 
-  const blog = new Blog({ ...request.body, user: user._id })
+  const blog = new Blog({ ...request.body, user: user._id });
 
   // Validate the blog data
   try {
-    await blog.validate()
+    await blog.validate();
   } catch (error) {
-    return response.status(400).json({ error: error.message })
+    return response.status(400).json({ error: error.message });
   }
 
   // Save the new blog to the database
-  const savedBlog = await blog.save()
-  user.blogs = user.blogs.concat(savedBlog._id)
-  await user.save()
-  response.status(201).json(savedBlog)
+  const savedBlog = await blog.save();
+  savedBlog.populate("user", { username: 1, name: 1, id: 1 });
+
+  user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
+
+  response.status(201).json(savedBlog);
 })
 
 blogsRouter.delete('/:id', userExtractor, async (request, response) => {

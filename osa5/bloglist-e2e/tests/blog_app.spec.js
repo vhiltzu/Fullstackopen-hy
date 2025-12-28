@@ -89,6 +89,23 @@ describe("Blog app", () => {
         // Verify that the like count has increased
         await expect(page.getByText("likes 1")).toBeVisible();
       });
+
+      test("user can remove a blog", async ({ page }) => {
+        // Expand blog details
+        await page
+          .getByText(`${blog.title} ${blog.author}`)
+          .getByRole("button", { name: "view" })
+          .click();
+
+        // Remove the blog
+        page.on("dialog", (dialog) => dialog.accept());
+        await page.getByRole("button", { name: "remove" }).click();
+
+        // Verify that the blog has been removed
+        await expect(
+          page.getByText(`${blog.title} ${blog.author}`)
+        ).not.toBeVisible();
+      });
     });
   });
 });
