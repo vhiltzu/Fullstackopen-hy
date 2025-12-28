@@ -24,24 +24,27 @@ function BlogForm({ createBlog }) {
       <h2>Create a new blog</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          title:
+          <label htmlFor="title">title:</label>
           <input
+            id="title"
             type="text"
             value={title}
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
         <div>
-          author:
+          <label htmlFor="author">author:</label>
           <input
+            id="author"
             type="text"
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
-          url:
+          <label htmlFor="url">url:</label>
           <input
+            id="url"
             type="text"
             value={url}
             onChange={({ target }) => setUrl(target.value)}
@@ -50,7 +53,7 @@ function BlogForm({ createBlog }) {
         <button type="submit">create</button>
       </form>
     </div>
-  )
+  );
 }
 
 export default BlogForm
