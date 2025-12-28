@@ -77,6 +77,7 @@ const App = () => {
     const blog = blogs.find((b) => b.id === id);
     const updatedBlog = { ...blog, likes: blog.likes + 1 };
 
+    // Make sure the user field is just the user id
     updatedBlog.user = blog.user.id;
 
     blogService.update(id, updatedBlog).then((returnedBlog) => {
