@@ -62,9 +62,10 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const content = useField('text')
-  const author = useField('text')
-  const info = useField('text')
+  // Prevent passing the reset function to the input elements by destructuring and renaming
+  const { reset: resetContent, ...content } = useField('text')
+  const { reset: resetAuthor, ...author } = useField('text')
+  const { reset: resetInfo, ...info } = useField('text')
 
 
   const handleSubmit = (e) => {
@@ -79,9 +80,11 @@ const CreateNew = (props) => {
 
   const handleReset = (e) => {
     e.preventDefault()
-    content.reset()
-    author.reset()
-    info.reset()
+
+    // Call the destructured reset functions to clear the input fields
+    resetContent()
+    resetAuthor()
+    resetInfo()
   }
 
   return (
