@@ -8,8 +8,8 @@ const AnecdoteList = () => {
     const filter = useSelector(state => state.filter)
 
     const vote = (anecdote) => {
-        dispatch(voteAnecdote(anecdote.id))
-        dispatch(setNotification(`You voted '${anecdote.content}'`))
+        dispatch(voteAnecdote(anecdote))
+        dispatch(setNotification(`You voted '${anecdote.content}'`, 5))
     }
 
     return (
