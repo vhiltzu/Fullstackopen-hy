@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import { getAnecdotes } from './requests'
+
 import AnecdoteForm from './components/AnecdoteForm'
 import AnecdoteList from './components/AnecdoteList'
-import Filter from './components/Filter'
 import Notification from './components/Notification'
-import { getAnecdotes } from './requests'
 
 const App = () => {
   const result = useQuery(
@@ -29,7 +29,6 @@ const App = () => {
     <div>
       <h2>Anecdotes</h2>
       <Notification />
-      <Filter />
       <AnecdoteList anecdotes={anecdotes} />
       <AnecdoteForm />
     </div>

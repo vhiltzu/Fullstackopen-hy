@@ -1,10 +1,11 @@
-import { useDispatch } from 'react-redux'
+import { useContext } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { setNotification } from '../reducers/notificationReducer'
 import { createAnecdote } from '../requests'
 
+import NotificationContext from '../NotificationContext'
+
 const AnecdoteForm = () => {
-    const dispatch = useDispatch()
+    const { setNotification } = useContext(NotificationContext)
     const queryClient = useQueryClient()
 
     const newAnecdoteMutation = useMutation({
@@ -12,8 +13,11 @@ const AnecdoteForm = () => {
         onSuccess: (anecdote) => {
             const anecdotes = queryClient.getQueryData(['anecdotes'])
             queryClient.setQueryData(['anecdotes'], anecdotes.concat(anecdote))
-            dispatch(setNotification(`You created '${anecdote.content}'`, 5))
+            setNotification(`You created '${anecdote.content}'`, 5)
         },
+        onError: (error) => {
+            setNotification(error.message, 5)
+        }
     })
 
     // Handler for adding a new anecdote
@@ -23,7 +27,7 @@ const AnecdoteForm = () => {
 
         // Validate anecdote length
         if (content.trim().length < 5) {
-            dispatch(setNotification('Anecdote must be at least 5 characters long', 5))
+            setNotification('Anecdote must be at least 5 characters long', 5)
             return
         }
 

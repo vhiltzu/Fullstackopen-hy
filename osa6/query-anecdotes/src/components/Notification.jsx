@@ -1,7 +1,8 @@
-import { useSelector } from 'react-redux'
+import { useContext } from 'react'
+import NotificationContext from '../NotificationContext'
 
 const Notification = () => {
-  const notification = useSelector(state => state.notification)
+  const { notification } = useContext(NotificationContext)
 
   if (!notification) {
     return null
