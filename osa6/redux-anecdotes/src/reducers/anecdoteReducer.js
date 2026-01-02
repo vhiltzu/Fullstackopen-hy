@@ -23,9 +23,9 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'VOTE':
       // return new state
-      return state.map(anecdote =>
+      return sortedAnecdotes(state.map(anecdote =>
         anecdote.id !== action.data.id ? anecdote : addVote(anecdote)
-      )
+      ))
     case 'NEW_ANECDOTE':
       // return new state
       return [...state, action.payload]
@@ -42,6 +42,11 @@ const addVote = (anecdoteToVote) => {
   }
 
   return updatedAnecdote
+}
+
+// Helper function to sort anecdotes by votes in descending order
+const sortedAnecdotes = (anecdotes) => {
+  return [...anecdotes].sort((anecdote1, anecdote2) => anecdote2.votes - anecdote1.votes)
 }
 
 export const createAnecdote = anecdote => ({
