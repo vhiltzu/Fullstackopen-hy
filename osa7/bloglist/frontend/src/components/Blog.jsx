@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { useQueryClient, useMutation } from '@tanstack/react-query'
+import NotificationContext from "../context/NotificationContext";
+import { likeBlog, deleteBlog } from "../requests/blogs";
 
-const Blog = ({ blog, canRemove, onLikeClick, onRemove }) => {
+const Blog = ({ blog, canRemove }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -11,16 +14,48 @@ const Blog = ({ blog, canRemove, onLikeClick, onRemove }) => {
 
   const [detailsVisible, setDetailsVisible] = useState(false);
 
+  const { setErrorNotification, setSuccessNotification } = useContext(NotificationContext)
+  const queryClient = useQueryClient()
+
+  // Handler for liking a blog
+  const blogLikeMutation = useMutation({
+    mutationFn: likeBlog,
+    onSuccess: (blog) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      const updatedBlogs = blogs.map(b => {
+        // Update only the liked blog's likes count
+        if (b.id === blog.id) {
+          b.likes = blog.likes
+        }
+        return b
+      }).sort((a, b) => b.likes - a.likes)
+
+      queryClient.setQueryData(['blogs'], updatedBlogs)
+      setSuccessNotification(`Blog '${blog.title}' liked successfully`)
+    },
+    onError: (error) => {
+      setErrorNotification(error.message)
+    }
+  })
+
+  // Handler for deleting a blog
+  const blogDeleteMutation = useMutation({
+    mutationFn: deleteBlog,
+    // No response data expected on deletion so use the passed blog object
+    onSuccess: (_, blog) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      const updatedBlogs = blogs.filter(b => b.id !== blog.id).sort((a, b) => b.likes - a.likes)
+
+      queryClient.setQueryData(['blogs'], updatedBlogs)
+      setSuccessNotification(`Blog '${blog.title}' deleted successfully`)
+    },
+    onError: (error) => {
+      setErrorNotification(error.message)
+    },
+  })
+
   const toggleDetailsVisibility = () => {
     setDetailsVisible(!detailsVisible);
-  };
-
-  const handleLikeClick = () => {
-    onLikeClick(blog);
-  };
-
-  const handleRemoveClick = () => {
-    onRemove(blog);
   };
 
   if (detailsVisible === false) {
@@ -44,13 +79,13 @@ const Blog = ({ blog, canRemove, onLikeClick, onRemove }) => {
         <p>{blog.url}</p>
         <p>
           likes {blog.likes}{" "}
-          <button type="button" onClick={handleLikeClick}>
+          <button type="button" onClick={() => blogLikeMutation.mutate(blog)}>
             like
           </button>
         </p>
         <p>{blog.user && blog.user.name}</p>
         {canRemove && (
-          <button type="button" onClick={handleRemoveClick}>
+          <button type="button" onClick={() => blogDeleteMutation.mutate(blog)}>
             remove
           </button>
         )}
