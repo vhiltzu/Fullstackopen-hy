@@ -1,47 +1,37 @@
-import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
-import { getUsers } from "../requests/users";
+const Users = ({ isLoading, users }) => {
+  if (isLoading) {
+    return (
+      <div>
+        <h2>Users</h2>
+        <p>loading users...</p>
+      </div>
+    );
+  }
 
-const Users = () => {
   return (
     <div>
       <h2>Users</h2>
-      <UserTable />
-    </div>
-  );
-};
-
-const UserTable = () => {
-  const result = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
-  });
-
-  if (result.isLoading) {
-    return <div>loading data...</div>;
-  }
-
-  if (result.isError) {
-    return <div>user service not available due to server problems</div>;
-  }
-
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Blogs created</th>
-        </tr>
-      </thead>
-      <tbody>
-        {result.data.map((user) => (
-          <tr key={user.id}>
-            <td>{user.name}</td>
-            <td>{user.blogs.length}</td>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Blogs created</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.name}</Link>
+              </td>
+              <td>{user.blogs.length}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
