@@ -1,4 +1,3 @@
-import axios from "axios";
 const baseUrl = "/api/blogs";
 
 let token = null;
@@ -53,9 +52,10 @@ export const likeBlog = async (blog) => {
 
 export const deleteBlog = async (blog) => {
   const config = {
+    method: "DELETE",
     headers: { Authorization: token },
   };
-  const request = axios.delete(`${baseUrl}/${blog.id}`, config);
+  const request = fetch(`${baseUrl}/${blog.id}`, config);
   const response = await request;
 
   return response.data;

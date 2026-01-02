@@ -1,30 +1,22 @@
-import { useContext, useState, useRef } from "react";
-import { useQuery } from '@tanstack/react-query'
+import { useContext, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+
+import BlogList from "./components/BlogList";
+import Users from "./components/Users";
+
 import NotificationContext from "./context/NotificationContext";
 import UserContext from "./context/UserContext";
-import { getBlogs } from "./requests/blogs";
-import Blog from "./components/Blog";
 import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
-import BlogForm from "./components/BlogForm";
 import loginService from "./services/login";
 
 const App = () => {
-  const { setErrorNotification, setSuccessNotification } = useContext(NotificationContext);
-  const { userSession, setUserSession, clearUserSession } = useContext(UserContext);
+  const { setErrorNotification, setSuccessNotification } =
+    useContext(NotificationContext);
+  const { userSession, setUserSession, clearUserSession } =
+    useContext(UserContext);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const blogFormRef = useRef();
-
-  const result = useQuery(
-    {
-      queryKey: ['blogs'],
-      queryFn: getBlogs,
-      enabled: userSession !== null,
-    },
-  )
 
   const handleLogin = (event) => {
     event.preventDefault();
@@ -82,16 +74,6 @@ const App = () => {
     );
   }
 
-  if (result.isLoading) {
-    return <div>loading data...</div>
-  }
-
-  if (result.isError) {
-    return <div>blog service not available due to server problems</div>
-  }
-
-  const blogs = result.data.sort((a, b) => b.likes - a.likes)
-
   return (
     <div>
       <h2>blogs</h2>
@@ -103,16 +85,10 @@ const App = () => {
         </button>
       </p>
 
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm />
-      </Togglable>
-      {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          canRemove={userSession.username === blog.user?.username} // Because there is no id matching available due lack of properties
-        />
-      ))}
+      <Routes>
+        <Route path="/users" element={<Users />} />
+        <Route path="/" element={<BlogList />} />
+      </Routes>
     </div>
   );
 };
