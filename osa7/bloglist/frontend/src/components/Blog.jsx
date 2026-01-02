@@ -1,9 +1,10 @@
 import { useState, useContext } from "react";
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import NotificationContext from "../context/NotificationContext";
+import UserContext from "../context/UserContext";
 import { likeBlog, deleteBlog } from "../requests/blogs";
 
-const Blog = ({ blog, canRemove }) => {
+const Blog = ({ blog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -15,6 +16,8 @@ const Blog = ({ blog, canRemove }) => {
   const [detailsVisible, setDetailsVisible] = useState(false);
 
   const { setErrorNotification, setSuccessNotification } = useContext(NotificationContext)
+  const { userSession } = useContext(UserContext)
+
   const queryClient = useQueryClient()
 
   // Handler for liking a blog
@@ -57,6 +60,8 @@ const Blog = ({ blog, canRemove }) => {
   const toggleDetailsVisibility = () => {
     setDetailsVisible(!detailsVisible);
   };
+
+  const canRemove = userSession && blog.user && (userSession.username === blog.user.username);
 
   if (detailsVisible === false) {
     return (

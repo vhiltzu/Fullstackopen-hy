@@ -1,19 +1,20 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useRef } from "react";
 import { useQuery } from '@tanstack/react-query'
 import NotificationContext from "./context/NotificationContext";
-import { getBlogs, setToken } from "./requests/blogs";
+import UserContext from "./context/UserContext";
+import { getBlogs } from "./requests/blogs";
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import BlogForm from "./components/BlogForm";
-import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 const App = () => {
   const { setErrorNotification, setSuccessNotification } = useContext(NotificationContext);
+  const { userSession, setUserSession, clearUserSession } = useContext(UserContext);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
 
   const blogFormRef = useRef();
 
@@ -21,21 +22,9 @@ const App = () => {
     {
       queryKey: ['blogs'],
       queryFn: getBlogs,
-      enabled: user !== null,
+      enabled: userSession !== null,
     },
   )
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
-
-    if (!loggedUserJSON) {
-      return;
-    }
-
-    const user = JSON.parse(loggedUserJSON);
-    setUser(user);
-    setToken(user.token);
-  }, []);
 
   const handleLogin = (event) => {
     event.preventDefault();
@@ -43,9 +32,7 @@ const App = () => {
     loginService
       .login(username, password)
       .then((user) => {
-        localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
-        setUser(user);
-        blogService.setToken(user.token);
+        setUserSession(user);
 
         setUsername("");
         setPassword("");
@@ -58,14 +45,12 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("loggedBlogAppUser");
+    clearUserSession();
     setSuccessNotification("Logged out successfully");
   };
 
   // Show login form if user is not logged in
-  if (user === null) {
+  if (userSession === null) {
     return (
       <div>
         <h2>Log in to application</h2>
@@ -112,7 +97,7 @@ const App = () => {
       <h2>blogs</h2>
       <Notification />
       <p>
-        {user.name} logged in{" "}
+        {userSession.name} logged in{" "}
         <button type="button" onClick={handleLogout}>
           logout
         </button>
@@ -125,7 +110,7 @@ const App = () => {
         <Blog
           key={blog.id}
           blog={blog}
-          canRemove={user.username === blog.user?.username} // Because there is no id matching available due lack of properties
+          canRemove={userSession.username === blog.user?.username} // Because there is no id matching available due lack of properties
         />
       ))}
     </div>
