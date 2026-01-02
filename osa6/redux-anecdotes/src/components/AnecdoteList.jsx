@@ -10,16 +10,6 @@ const AnecdoteForm = () => {
         dispatch(voteAnecdote(id))
     }
 
-    // Handler for adding a new anecdote
-    const addAnecdote = event => {
-        event.preventDefault()
-        const content = event.target.anecdote.value
-        event.target.anecdote.value = ''
-
-        // Use the action creator to dispatch the action
-        dispatch(createAnecdote(content))
-    }
-
     return (
         <div>
             {anecdotes.map(anecdote => (
