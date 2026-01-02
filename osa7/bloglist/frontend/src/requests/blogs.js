@@ -33,7 +33,11 @@ export const createBlog = async (newBlog) => {
 };
 
 export const likeBlog = async (blog) => {
-  const updatedBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id };
+  const updatedBlog = { ...blog, likes: blog.likes + 1 };
+
+  if (blog.user) {
+    updatedBlog.user = blog.user.id;
+  }
 
   const options = {
     method: 'PUT',
@@ -41,7 +45,7 @@ export const likeBlog = async (blog) => {
     body: JSON.stringify(updatedBlog),
   }
 
-  const response = await fetch(`${baseUrl}/${blog.id}`, options)
+  const response = await fetch(`${baseUrl}/${updatedBlog.id}`, options)
 
   if (!response.ok) {
     throw new Error('Failed to vote blog')

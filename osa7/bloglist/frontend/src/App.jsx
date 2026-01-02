@@ -2,11 +2,13 @@ import { useContext, useState } from "react";
 import { Routes, Route, useMatch } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
+import { getBlogs } from "./requests/blogs";
 import { getUsers } from "./requests/users";
 
+import Blog from "./components/Blog";
 import BlogList from "./components/BlogList";
-import Users from "./components/Users";
 import User from "./components/User";
+import Users from "./components/Users";
 
 import NotificationContext from "./context/NotificationContext";
 import UserContext from "./context/UserContext";
@@ -23,10 +25,16 @@ const App = () => {
   const [password, setPassword] = useState("");
 
   const userId = useMatch("/users/:id");
+  const blogId = useMatch("/blogs/:id");
 
   const userResult = useQuery({
     queryKey: ["users"],
     queryFn: getUsers,
+  });
+
+  const blogResult = useQuery({
+    queryKey: ["blogs"],
+    queryFn: getBlogs,
   });
 
   const handleLogin = (event) => {
@@ -93,6 +101,14 @@ const App = () => {
     return userResult.data.find((user) => user.id === userId.params.id);
   };
 
+  const getBlogById = () => {
+    if (!blogId || !blogResult.isSuccess) {
+      return null;
+    }
+
+    return blogResult.data.find((blog) => blog.id === blogId.params.id);
+  };
+
   return (
     <div>
       <h2>blogs</h2>
@@ -117,7 +133,21 @@ const App = () => {
             <Users isLoading={userResult.isLoading} users={userResult.data} />
           }
         />
-        <Route path="/" element={<BlogList />} />
+        <Route
+          path="/blogs/:id"
+          element={
+            <Blog isLoading={blogResult.isLoading} blog={getBlogById()} />
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <BlogList
+              isLoading={blogResult.isLoading}
+              blogs={blogResult.data}
+            />
+          }
+        />
       </Routes>
     </div>
   );

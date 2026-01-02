@@ -1,36 +1,44 @@
 import { useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getBlogs } from "../requests/blogs";
-import Blog from "./Blog";
-import Togglable from "./Togglable";
-import BlogForm from "./BlogForm";
+import { Link } from "react-router-dom";
 
-const BlogList = () => {
+import BlogForm from "./BlogForm";
+import Togglable from "./Togglable";
+
+const BlogList = ({ isLoading, blogs }) => {
   const blogFormRef = useRef();
 
-  const result = useQuery({
-    queryKey: ["blogs"],
-    queryFn: getBlogs,
-  });
-
-  if (result.isLoading) {
+  if (isLoading) {
     return <div>loading data...</div>;
   }
 
-  if (result.isError) {
-    return <div>blog service not available due to server problems</div>;
-  }
-
-  const blogs = result.data.sort((a, b) => b.likes - a.likes);
+  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
 
   return (
     <div>
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm />
       </Togglable>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+      {sortedBlogs.map((blog) => (
+        <BlogListItem key={blog.id} blog={blog} />
       ))}
+    </div>
+  );
+};
+
+const BlogListItem = ({ blog }) => {
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: "solid",
+    borderWidth: 1,
+    marginBottom: 5,
+  };
+
+  return (
+    <div style={blogStyle} className="blog">
+      <Link to={`/blogs/${blog.id}`}>
+        {blog.title} {blog.author}
+      </Link>
     </div>
   );
 };
