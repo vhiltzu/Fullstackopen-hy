@@ -11,7 +11,11 @@ const AnecdoteList = ({ anecdotes }) => {
     const voteAnecdoteMutation = useMutation({
         mutationFn: voteAnecdote,
         onSuccess: (anecdote) => {
-            queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
+            const anecdotes = queryClient.getQueryData(['anecdotes'])
+            queryClient.setQueryData(
+                ['anecdotes'],
+                anecdotes.map(a => a.id === anecdote.id ? anecdote : a)
+            )
             dispatch(setNotification(`You voted '${anecdote.content}'`, 5))
         },
     })
