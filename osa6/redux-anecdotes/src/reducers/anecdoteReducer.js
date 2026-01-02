@@ -24,7 +24,7 @@ const { setAnecdotes, createAnecdote, vote } = anecdoteSlice.actions
 export const initializeAnecdotes = () => {
   return async (dispatch) => {
     const anecdotes = await anecdoteService.getAll()
-    return dispatch(setAnecdotes(anecdotes))
+    return dispatch(setAnecdotes(anecdotes.sort((a, b) => b.votes - a.votes)))
   }
 }
 

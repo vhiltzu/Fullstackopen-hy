@@ -1,28 +1,9 @@
-import { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { resetNotification } from '../reducers/notificationReducer'
+import { useSelector } from 'react-redux'
 
 const Notification = () => {
-  const dispatch = useDispatch()
   const notification = useSelector(state => state.notification)
 
-  useEffect(() => {
-    // Do nothing if there's no notification
-    if (notification === '') {
-      return
-    }
-
-    // Clear the notification after displaying it
-    const timeoutId = setTimeout(() => {
-      dispatch(resetNotification())
-    }, 5000)
-
-    return () => {
-      clearTimeout(timeoutId)
-    }
-  }, [notification])
-
-  if (notification === '') {
+  if (!notification) {
     return null
   }
 
