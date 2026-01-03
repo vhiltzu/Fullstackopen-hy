@@ -1,12 +1,13 @@
-import { useContext } from "react";
+import { Box, Button, List, ListItem, Typography } from "@mui/material";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-
-import { getBlogById, likeBlog, deleteBlog } from "../requests/blogs";
+import { useContext } from "react";
+import { Link } from "react-router-dom";
 
 import NotificationContext from "../context/NotificationContext";
 import UserContext from "../context/UserContext";
-import Togglable from "./Togglable";
+import { getBlogById, likeBlog, deleteBlog } from "../requests/blogs";
 import BlogCommentForm from "./BlogCommentForm";
+import Togglable from "./Togglable";
 
 const Blog = ({ id }) => {
   const { setErrorNotification, setSuccessNotification } =
@@ -69,6 +70,14 @@ const Blog = ({ id }) => {
     return <div>loading blog...</div>;
   }
 
+  if (!blog.data) {
+    return (
+      <Box>
+        <Alert severity="error">Blog not found</Alert>
+      </Box>
+    );
+  }
+
   const canRemove =
     userSession &&
     blog.data.user &&
@@ -76,41 +85,56 @@ const Blog = ({ id }) => {
 
   return (
     <div>
-      <h2>
+      <Typography variant="h5" gutterBottom>
         {blog.data.title} {blog.data.author}
-      </h2>
+      </Typography>
       <div className="blogDetails">
-        <div>{blog.data.url}</div>
         <div>
-          likes {blog.data.likes}{" "}
-          <button
+          <Link to={blog.data.url}>
+            <Typography variant="body1">{blog.data.url}</Typography>
+          </Link>
+        </div>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Typography variant="body1">likes {blog.data.likes} </Typography>
+          <Button
+            size="small"
             type="button"
+            variant="text"
             onClick={() => blogLikeMutation.mutate(blog.data)}
           >
             like
-          </button>
-        </div>
-        <div>{blog.data.user && blog.data.user.name}</div>
+          </Button>
+        </Box>
+        <Box>
+          <Typography variant="body1">
+            {blog.data.user && blog.data.user.name}
+          </Typography>
+        </Box>
         {canRemove && (
-          <button
+          <Button
+            size="small"
             type="button"
             onClick={() => blogDeleteMutation.mutate(blog.data)}
           >
             remove
-          </button>
+          </Button>
         )}
       </div>
       <div className="blogComments">
-        <h3>comments</h3>
+        <Typography variant="h6" gutterBottom>
+          comments
+        </Typography>
         <Togglable buttonLabel="add comment">
           <BlogCommentForm blogId={blog.data.id} />
         </Togglable>
-        <ul>
+        <List>
           {blog.data.comments &&
             blog.data.comments.map((comment, index) => (
-              <li key={index}>{comment}</li>
+              <ListItem key={index}>
+                <Typography variant="body2">{comment}</Typography>
+              </ListItem>
             ))}
-        </ul>
+        </List>
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
-import { useState, useContext } from "react";
+import { Button, TextField, Box } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext, useState } from "react";
+
 import NotificationContext from "../context/NotificationContext";
 import { commentBlog } from "../requests/blogs";
 
@@ -34,21 +36,24 @@ function BlogCommentForm({ blogId }) {
   };
 
   return (
-    <div>
+    <Box>
       <h2>Add a new comment</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="comment">comment:</label>
-          <input
+          <TextField
             id="comment"
+            label="comment"
             type="text"
             value={comment}
+            size="small"
             onChange={({ target }) => setComment(target.value)}
           />
         </div>
-        <button type="submit">send</button>
+        <Button size="small" type="submit">
+          send
+        </Button>
       </form>
-    </div>
+    </Box>
   );
 }
 

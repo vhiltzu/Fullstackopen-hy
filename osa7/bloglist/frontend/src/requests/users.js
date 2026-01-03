@@ -9,3 +9,13 @@ export const getUsers = async () => {
 
   return await response.json()
 };
+
+export const getUserById = async (id) => {
+  const response = await fetch(`${baseUrl}/${id}`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch user')
+  }
+
+  return await response.json();
+};

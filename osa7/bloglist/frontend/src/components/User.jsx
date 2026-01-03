@@ -1,39 +1,54 @@
-import { useEffect, useContext } from "react";
+import { Alert, Box, List, ListItem, Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { useContext } from "react";
+import { Link } from "react-router-dom";
 
 import NotificationContext from "../context/NotificationContext";
+import { getUserById } from "../requests/users";
 
-const User = ({ isLoading, user }) => {
+const User = ({ id }) => {
   const { setErrorNotification } = useContext(NotificationContext);
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      setErrorNotification("User not found");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, isLoading]);
+  const userResult = useQuery({
+    queryKey: ["users", id],
+    queryFn: () => getUserById(id),
+    onError: (error) => {
+      setErrorNotification(error.message);
+    },
+  });
 
-  if (isLoading) {
+  if (userResult.isLoading) {
     return (
-      <div>
-        <p>loading user...</p>
-      </div>
+      <Box>
+        <Typography>loading user...</Typography>
+      </Box>
     );
   }
 
-  if (!user) {
-    return null;
+  if (!userResult.data) {
+    return (
+      <Box>
+        <Alert severity="error">User not found</Alert>
+      </Box>
+    );
   }
 
   return (
-    <div>
-      <h2>{user.name}</h2>
-      <h3>Added blogs</h3>
-      <ul>
-        {user.blogs.map((blog) => (
-          <li key={blog.id}>{blog.title}</li>
+    <Box>
+      <Typography variant="h5" gutterBottom>
+        {userResult.data.name}
+      </Typography>
+      <Typography variant="h6" gutterBottom>
+        Added blogs
+      </Typography>
+      <List>
+        {userResult.data.blogs.map((blog) => (
+          <ListItem component={Link} to={`/blogs/${blog.id}`} key={blog.id}>
+            <Typography variant="body2">{blog.title}</Typography>
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 };
 

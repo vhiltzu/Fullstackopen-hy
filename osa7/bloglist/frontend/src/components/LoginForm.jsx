@@ -1,11 +1,11 @@
-import { useContext, useState } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { login } from "../requests/login";
-
-import UserContext from "../context/UserContext";
 import NotificationContext from "../context/NotificationContext";
+import UserContext from "../context/UserContext";
+import { login } from "../requests/login";
 
 const LoginForm = () => {
   const { setErrorNotification, setSuccessNotification } =
@@ -43,32 +43,36 @@ const LoginForm = () => {
   };
 
   return (
-    <div>
-      <h2>Log in to application</h2>
+    <Box>
+      <Typography variant="h5" gutterBottom>
+        Log in to application
+      </Typography>
       <form onSubmit={handleLogin}>
         <div>
-          <label>
-            username
-            <input
-              type="text"
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </label>
+          <TextField
+            label="username"
+            type="text"
+            value={username}
+            size="small"
+            onChange={({ target }) => setUsername(target.value)}
+          />
         </div>
         <div>
-          <label>
-            password
-            <input
-              type="password"
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </label>
+          <TextField
+            label="password"
+            type="password"
+            value={password}
+            size="small"
+            onChange={({ target }) => setPassword(target.value)}
+          />
         </div>
-        <button type="submit">login</button>
+        <div>
+          <Button type="submit" color="primary" variant="contained">
+            login
+          </Button>
+        </div>
       </form>
-    </div>
+    </Box>
   );
 };
 

@@ -1,42 +1,45 @@
-import { createContext } from 'react'
-import { useReducer } from 'react'
+import { createContext, useReducer } from "react";
 
-import notificationReducer from '../reducers/notificationReducer'
+import notificationReducer from "../reducers/notificationReducer";
 
-const NotificationContext = createContext()
-let timerId = null
+const NotificationContext = createContext();
+let timerId = null;
 
 export const NotificationContextProvider = (props) => {
-    const [notification, notificationDispatch] = useReducer(notificationReducer, null)
+  const [notification, notificationDispatch] = useReducer(
+    notificationReducer,
+    null
+  );
 
-    const setNotification = (message, kind, timeInSeconds = 5) => {
-        notificationDispatch({ type: "SET", payload: { message, kind } })
+  const setNotification = (message, severity, timeInSeconds = 5) => {
+    notificationDispatch({ type: "SET", payload: { message, severity } });
 
-        // Clear any existing timer
-        if (timerId) {
-            clearTimeout(timerId)
-        }
-
-        // Clear the notification after the specified time
-        timerId = setTimeout(() => {
-            notificationDispatch({ type: "RESET" })
-        }, timeInSeconds * 1000)
+    // Clear any existing timer
+    if (timerId) {
+      clearTimeout(timerId);
     }
 
-    const setErrorNotification = (message, timeInSeconds = 5) => {
-        setNotification(message, "error", timeInSeconds)
-    }
+    // Clear the notification after the specified time
+    timerId = setTimeout(() => {
+      notificationDispatch({ type: "RESET" });
+    }, timeInSeconds * 1000);
+  };
 
-    const setSuccessNotification = (message, timeInSeconds = 5) => {
-        setNotification(message, "success", timeInSeconds)
-    }
+  const setErrorNotification = (message, timeInSeconds = 5) => {
+    setNotification(message, "error", timeInSeconds);
+  };
 
-    return (
-        <NotificationContext.Provider value={{ notification, setErrorNotification, setSuccessNotification }}>
-            {props.children}
-        </NotificationContext.Provider>
-    )
-}
+  const setSuccessNotification = (message, timeInSeconds = 5) => {
+    setNotification(message, "success", timeInSeconds);
+  };
 
+  return (
+    <NotificationContext.Provider
+      value={{ notification, setErrorNotification, setSuccessNotification }}
+    >
+      {props.children}
+    </NotificationContext.Provider>
+  );
+};
 
-export default NotificationContext
+export default NotificationContext;

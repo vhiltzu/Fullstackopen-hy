@@ -1,5 +1,7 @@
-import { useState, useContext } from "react";
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Box, Button, TextField } from "@mui/material";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext, useState } from "react";
+
 import NotificationContext from "../context/NotificationContext";
 import { createBlog } from "../requests/blogs";
 
@@ -8,20 +10,23 @@ function BlogForm() {
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
 
-  const { setErrorNotification, setSuccessNotification } = useContext(NotificationContext)
-  const queryClient = useQueryClient()
+  const { setErrorNotification, setSuccessNotification } =
+    useContext(NotificationContext);
+  const queryClient = useQueryClient();
 
   const newBlogMutation = useMutation({
     mutationFn: createBlog,
     onSuccess: (blog) => {
-      const blogs = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(['blogs'], blogs.concat(blog))
-      setSuccessNotification(`A new blog '${blog.title}' by ${blog.author} added`)
+      const blogs = queryClient.getQueryData(["blogs"]);
+      queryClient.setQueryData(["blogs"], blogs.concat(blog));
+      setSuccessNotification(
+        `A new blog '${blog.title}' by ${blog.author} added`
+      );
     },
     onError: (error) => {
-      setErrorNotification(error.message)
-    }
-  })
+      setErrorNotification(error.message);
+    },
+  });
 
   // Handler for adding a new blog
   const handleSubmit = (event) => {
@@ -39,39 +44,44 @@ function BlogForm() {
   };
 
   return (
-    <div>
+    <Box>
       <h2>Create a new blog</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="title">title:</label>
-          <input
+          <TextField
             id="title"
+            label="title"
             type="text"
             value={title}
+            size="small"
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
         <div>
-          <label htmlFor="author">author:</label>
-          <input
+          <TextField
             id="author"
+            label="author"
             type="text"
             value={author}
+            size="small"
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
-          <label htmlFor="url">url:</label>
-          <input
+          <TextField
             id="url"
+            label="url"
             type="text"
             value={url}
+            size="small"
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>
-        <button type="submit">create</button>
+        <Button size="small" type="submit">
+          create
+        </Button>
       </form>
-    </div>
+    </Box>
   );
 }
 

@@ -1,13 +1,16 @@
-import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { List, ListItem, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { useRef, useContext } from "react";
+import { Link } from "react-router-dom";
 
+import UserContext from "../context/UserContext";
 import { getBlogs } from "../requests/blogs";
-
 import BlogForm from "./BlogForm";
 import Togglable from "./Togglable";
 
 const BlogList = () => {
+  const { userSession } = useContext(UserContext);
+
   const blogFormRef = useRef();
 
   const blogs = useQuery({
@@ -22,30 +25,25 @@ const BlogList = () => {
   const sortedBlogs = blogs.data.sort((a, b) => b.likes - a.likes);
   return (
     <div>
-      <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-        <BlogForm />
-      </Togglable>
-      {sortedBlogs.map((blog) => (
-        <BlogListItem key={blog.id} blog={blog} />
-      ))}
-    </div>
-  );
-};
-
-const BlogListItem = ({ blog }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  return (
-    <div style={blogStyle} className="blog">
-      <Link to={`/blogs/${blog.id}`}>
-        {blog.title} {blog.author}
-      </Link>
+      {userSession && (
+        <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+          <BlogForm />
+        </Togglable>
+      )}
+      <List>
+        {sortedBlogs.map((blog) => (
+          <ListItem
+            button
+            key={blog.id}
+            component={Link}
+            to={`/blogs/${blog.id}`}
+          >
+            <Typography variant="body2">
+              {blog.title} {blog.author}
+            </Typography>
+          </ListItem>
+        ))}
+      </List>
     </div>
   );
 };
