@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Route, Routes, Link } from "react-router-dom";
-import { useApolloClient } from "@apollo/client/react";
+import { useApolloClient, useSubscription } from "@apollo/client/react";
 
 import Authors from "./components/Authors";
 import Books from "./components/Books";
@@ -9,12 +9,24 @@ import LoginForm from "./components/LoginForm";
 import Recommendations from "./components/Recommendations";
 import Notify from "./components/Notify";
 
+import { addBookToCache } from "./utils/apolloCache";
+import { BOOK_ADDED } from "./queries";
+
 const App = () => {
   const [token, setToken] = useState(
     localStorage.getItem("library-user-token")
   );
   const [errorMessage, setErrorMessage] = useState(null);
   const client = useApolloClient();
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const addedBook = data.data.bookAdded;
+      notify(`${addedBook.title} by ${addedBook.author.name} added`);
+
+      addBookToCache(client.cache, addedBook);
+    },
+  });
 
   const notify = (message) => {
     setErrorMessage(message);

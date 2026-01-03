@@ -1,11 +1,14 @@
 const { GraphQLError } = require("graphql");
 const { ApolloServerErrorCode } = require("@apollo/server/errors");
+const { PubSub } = require("graphql-subscriptions");
 const { v1: uuid } = require("uuid");
 const jwt = require("jsonwebtoken");
 
 const Author = require("./models/author");
 const Book = require("./models/book");
 const User = require("./models/user");
+
+const pubsub = new PubSub();
 
 const resolvers = {
   Query: {
@@ -71,7 +74,7 @@ const resolvers = {
       const newBook = new Book({ ...args, id: uuid(), author: author.id });
 
       try {
-        return await newBook.save();
+        await newBook.save();
       } catch (error) {
         throw new GraphQLError("Saving book failed", {
           extensions: {
@@ -81,6 +84,11 @@ const resolvers = {
           },
         });
       }
+
+      const bookAdded = await newBook.populate("author");
+
+      pubsub.publish("BOOK_ADDED", { bookAdded });
+      return bookAdded;
     },
     editAuthor: async (_, args, context) => {
       const currentUser = context.currentUser;
@@ -135,6 +143,11 @@ const resolvers = {
       };
 
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
+    },
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator("BOOK_ADDED"),
     },
   },
 };
