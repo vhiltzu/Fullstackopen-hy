@@ -90,7 +90,7 @@ const resolvers = {
 
       const bookAdded = await newBook.populate("author");
 
-      pubsub.publish("BOOK_ADDED", { bookAdded });
+      await pubsub.publish("BOOK_ADDED", { bookAdded });
       return bookAdded;
     },
     editAuthor: async (_, args, context) => {
@@ -152,7 +152,7 @@ const resolvers = {
   // Subscriptions
   Subscription: {
     bookAdded: {
-      subscribe: () => pubsub.asyncIterator("BOOK_ADDED"),
+      subscribe: () => pubsub.asyncIterableIterator("BOOK_ADDED"),
     },
   },
 
