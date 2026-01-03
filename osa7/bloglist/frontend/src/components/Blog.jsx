@@ -5,6 +5,8 @@ import { getBlogById, likeBlog, deleteBlog } from "../requests/blogs";
 
 import NotificationContext from "../context/NotificationContext";
 import UserContext from "../context/UserContext";
+import Togglable from "./Togglable";
+import BlogCommentForm from "./BlogCommentForm";
 
 const Blog = ({ id }) => {
   const { setErrorNotification, setSuccessNotification } =
@@ -100,6 +102,9 @@ const Blog = ({ id }) => {
       </div>
       <div className="blogComments">
         <h3>comments</h3>
+        <Togglable buttonLabel="add comment">
+          <BlogCommentForm blogId={blog.data.id} />
+        </Togglable>
         <ul>
           {blog.data.comments &&
             blog.data.comments.map((comment, index) => (

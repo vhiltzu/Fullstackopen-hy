@@ -42,6 +42,22 @@ export const createBlog = async (newBlog) => {
   return await response.json()
 };
 
+export const commentBlog = async (newComment) => {
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: token },
+    body: JSON.stringify({ comment: newComment.comment })
+  }
+
+  const response = await fetch(`${baseUrl}/${newComment.id}/comments`, options)
+
+  if (!response.ok) {
+    throw new Error('Failed to create blog')
+  }
+
+  return await response.json()
+};
+
 export const likeBlog = async (blog) => {
   const updatedBlog = { ...blog, likes: blog.likes + 1 };
 
