@@ -41,11 +41,32 @@ const resolvers = {
 
       if (!author) {
         author = new Author({ name: args.author, id: uuid() });
-        await author.save();
+        try {
+          await author.save();
+        } catch (error) {
+          throw new GraphQLError("Saving author failed", {
+            extensions: {
+              code: ApolloServerErrorCode.BAD_USER_INPUT,
+              invalidArgs: args,
+              error,
+            },
+          });
+        }
       }
 
       const newBook = new Book({ ...args, id: uuid(), author: author._id });
-      return await newBook.save();
+
+      try {
+        return await newBook.save();
+      } catch (error) {
+        throw new GraphQLError("Saving book failed", {
+          extensions: {
+            code: ApolloServerErrorCode.BAD_USER_INPUT,
+            invalidArgs: args,
+            error,
+          },
+        });
+      }
     },
     editAuthor: async (_, args) => {
       const author = await Author.findOne({ name: args.name });
