@@ -2,6 +2,7 @@ const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const { userExtractor } = require("../utils/middleware");
 
+// CRUD operations for blogs
 blogsRouter.get("/", async (request, response) => {
   const blog = await Blog.find({}).populate("user", {
     username: 1,
@@ -9,6 +10,20 @@ blogsRouter.get("/", async (request, response) => {
     id: 1,
   });
   response.json(blog);
+});
+
+blogsRouter.get("/:id", async (request, response) => {
+  const blog = await Blog.findById(request.params.id).populate("user", {
+    username: 1,
+    name: 1,
+    id: 1,
+  });
+
+  if (blog) {
+    response.json(blog);
+  } else {
+    response.status(404).end();
+  }
 });
 
 blogsRouter.post("/", userExtractor, async (request, response) => {
@@ -80,6 +95,29 @@ blogsRouter.put("/:id", async (request, response) => {
   );
 
   response.json(updatedBlog);
+});
+
+// Comments endpoint
+blogsRouter.post("/:id/comments", async (request, response) => {
+  const { comment } = request.body;
+
+  if (!comment || comment.trim() === "") {
+    return response.status(400).json({ error: "Comment cannot be empty" });
+  }
+
+  const blog = await Blog.findById(request.params.id);
+  if (!blog) {
+    return response.status(404).json({ error: "Blog not found" });
+  }
+
+  if (!blog.comments) {
+    blog.comments = [];
+  }
+  
+  blog.comments = blog.comments.concat(comment);
+  const updatedBlog = await blog.save();
+
+  response.status(201).json(updatedBlog);
 });
 
 module.exports = blogsRouter;

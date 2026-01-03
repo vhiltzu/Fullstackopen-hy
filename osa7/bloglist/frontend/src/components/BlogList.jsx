@@ -1,18 +1,25 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
+import { getBlogs } from "../requests/blogs";
 
 import BlogForm from "./BlogForm";
 import Togglable from "./Togglable";
 
-const BlogList = ({ isLoading, blogs }) => {
+const BlogList = () => {
   const blogFormRef = useRef();
 
-  if (isLoading) {
+  const blogs = useQuery({
+    queryKey: ["blogs"],
+    queryFn: getBlogs,
+  });
+
+  if (blogs.isLoading) {
     return <div>loading data...</div>;
   }
 
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
-
+  const sortedBlogs = blogs.data.sort((a, b) => b.likes - a.likes);
   return (
     <div>
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>

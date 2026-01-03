@@ -16,6 +16,16 @@ export const getBlogs = async () => {
   return await response.json()
 };
 
+export const getBlogById = async (id) => {
+  const response = await fetch(`${baseUrl}/${id}`);
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch blog')
+  }
+
+  return await response.json();
+};
+
 export const createBlog = async (newBlog) => {
   const options = {
     method: 'POST',

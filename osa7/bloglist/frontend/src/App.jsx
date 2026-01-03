@@ -1,7 +1,6 @@
 import { Routes, Route, useMatch } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { getBlogs } from "./requests/blogs";
 import { getUsers } from "./requests/users";
 
 import Notification from "./components/Notification";
@@ -22,25 +21,12 @@ const App = () => {
     queryFn: getUsers,
   });
 
-  const blogResult = useQuery({
-    queryKey: ["blogs"],
-    queryFn: getBlogs,
-  });
-
   const getUserById = () => {
     if (!userId || !userResult.isSuccess) {
       return null;
     }
 
     return userResult.data.find((user) => user.id === userId.params.id);
-  };
-
-  const getBlogById = () => {
-    if (!blogId || !blogResult.isSuccess) {
-      return null;
-    }
-
-    return blogResult.data.find((blog) => blog.id === blogId.params.id);
   };
 
   return (
@@ -64,19 +50,9 @@ const App = () => {
         />
         <Route
           path="/blogs/:id"
-          element={
-            <Blog isLoading={blogResult.isLoading} blog={getBlogById()} />
-          }
+          element={<Blog id={blogId ? blogId.params.id : null} />}
         />
-        <Route
-          path="/"
-          element={
-            <BlogList
-              isLoading={blogResult.isLoading}
-              blogs={blogResult.data}
-            />
-          }
-        />
+        <Route path="/" element={<BlogList />} />
       </Routes>
     </div>
   );
