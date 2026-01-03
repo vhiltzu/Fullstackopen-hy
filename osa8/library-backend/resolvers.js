@@ -11,7 +11,7 @@ const resolvers = {
     allBooks: async (_, args) => {
       return await Book.find({
         ...(args.author && { author: args.author }),
-        ...(args.genre && { genres: args.genre }),
+        ...(args.genre && { genres: { $all: args.genre } }),
       });
     },
     allAuthors: async () => {
