@@ -1,7 +1,10 @@
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
+import { Link } from "react-router-dom";
 
-const ALL_AUTHORS = gql`
+import SetBirthyearForm from "./SetBirthyearForm.jsx";
+
+export const ALL_AUTHORS = gql`
   query {
     allAuthors {
       name
@@ -38,13 +41,16 @@ const Authors = () => {
           </tr>
           {authors.map((a) => (
             <tr key={a.id}>
-              <td>{a.name}</td>
+              <td>
+                <Link to={`/authors/${a.id}`}>{a.name}</Link>
+              </td>
               <td>{a.born}</td>
               <td>{a.bookCount}</td>
             </tr>
           ))}
         </tbody>
       </table>
+      <SetBirthyearForm authors={authors} />
     </div>
   );
 };

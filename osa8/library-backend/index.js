@@ -137,12 +137,13 @@ const resolvers = {
         filters.every((filterFunc) => filterFunc(book))
       );
     },
-    allAuthors: () =>
-      authors.map((author) => ({
+    allAuthors: () => {
+      return authors.map((author) => ({
         ...author,
         // Calculate bookCount using the authors' names due the lack of author IDs in books
         bookCount: books.filter((book) => book.author === author.name).length,
-      })),
+      }));
+    },
   },
   Mutation: {
     addBook: (_, args) => {
