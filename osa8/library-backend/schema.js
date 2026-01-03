@@ -4,6 +4,7 @@ const typeDefs = /* GraphQL */ `
     born: Int
     id: ID!
     bookCount: Int!
+    authorOf: [Book!]!
   }
 
   type Book {

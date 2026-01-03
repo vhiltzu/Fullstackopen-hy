@@ -11,6 +11,7 @@ const User = require("./models/user");
 const pubsub = new PubSub();
 
 const resolvers = {
+  // Queries
   Query: {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
@@ -27,6 +28,8 @@ const resolvers = {
       return context.currentUser;
     },
   },
+
+  // Mutations
   Mutation: {
     addBook: async (_, args, context) => {
       const currentUser = context.currentUser;
@@ -145,9 +148,25 @@ const resolvers = {
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
     },
   },
+
+  // Subscriptions
   Subscription: {
     bookAdded: {
       subscribe: () => pubsub.asyncIterator("BOOK_ADDED"),
+    },
+  },
+
+  // Extended types
+  Author: {
+    bookCount: async (root) => {
+      return await Book.countDocuments({ author: root.id });
+    },
+  },
+  User: {
+    recommendedBooks: async (root) => {
+      return await Book.find({ genres: { $all: root.favoriteGenre } }).populate(
+        "author"
+      );
     },
   },
 };

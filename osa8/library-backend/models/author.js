@@ -1,27 +1,16 @@
 const mongoose = require("mongoose");
 const Book = require("./book");
 
-const schema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-      minlength: 4,
-    },
-    born: {
-      type: Number,
-    },
+const schema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    minlength: 4,
   },
-  {
-    virtuals: {
-      bookCount: {
-        async get() {
-          return await Book.find({ author: this.id }).countDocuments();
-        },
-      },
-    },
-  }
-);
+  born: {
+    type: Number,
+  },
+});
 
 module.exports = mongoose.model("Author", schema);
