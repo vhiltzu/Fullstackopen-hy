@@ -110,6 +110,7 @@ const typeDefs = /* GraphQL */ `
       published: Int!
       genres: [String!]!
     ): Book
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 `;
 
@@ -144,6 +145,20 @@ const resolvers = {
   },
   Mutation: {
     addBook: (_, args) => {
+      if (
+        books.find((p) => p.title === args.title && p.author === args.author)
+      ) {
+        throw new GraphQLError(
+          `Title and author must be unique: ${args.title}`,
+          {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: [args.title, args.author],
+            },
+          }
+        );
+      }
+
       const newBook = { ...args, id: uuid() };
       books.push(newBook);
 
@@ -156,6 +171,16 @@ const resolvers = {
       }
 
       return newBook;
+    },
+    editAuthor: (_, args) => {
+      const author = authors.find((a) => a.name === args.name);
+
+      if (!author) {
+        return null;
+      }
+
+      author.born = args.setBornTo;
+      return author;
     },
   },
 };
