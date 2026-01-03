@@ -84,6 +84,7 @@ const typeDefs = /* GraphQL */ `
     name: String!
     born: Int
     id: ID!
+    bookCount: Int!
   }
 
   type Book {
@@ -98,6 +99,7 @@ const typeDefs = /* GraphQL */ `
     bookCount: Int!
     authorCount: Int!
     allBooks: [Book!]!
+    allAuthors: [Author!]!
   }
 `;
 
@@ -106,6 +108,12 @@ const resolvers = {
     bookCount: () => books.length,
     authorCount: () => authors.length,
     allBooks: () => books,
+    allAuthors: () =>
+      authors.map((author) => ({
+        ...author,
+        // Calculate bookCount using the authors' names due the lack of author IDs in books
+        bookCount: books.filter((book) => book.author === author.name).length,
+      })),
   },
 };
 
