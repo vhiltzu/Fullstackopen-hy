@@ -12,36 +12,34 @@ const resolvers = {
       return await Book.find({
         ...(args.author && { author: args.author }),
         ...(args.genre && { genres: { $all: args.genre } }),
-      });
+      }).populate("author");
     },
     allAuthors: async () => {
-      return await Author.find({}).populate("bookCount");
+      return await Author.find({});
     },
   },
   Mutation: {
     addBook: async (_, args) => {
-      const bookExists = await Book.findOne({
+      const bookExists = await Book.exists({
         title: args.title,
-        author: args.author,
       });
 
       if (bookExists) {
-        throw new GraphQLError(
-          `Title and author must be unique: ${args.title}`,
-          {
-            extensions: {
-              code: ApolloServerErrorCode.BAD_USER_INPUT,
-              invalidArgs: [args.title, args.author],
-            },
-          }
-        );
+        throw new GraphQLError(`Title must be unique: ${args.title}`, {
+          extensions: {
+            code: ApolloServerErrorCode.BAD_USER_INPUT,
+            invalidArgs: [args.title],
+          },
+        });
       }
 
-      let author = await Author.findOne({ name: args.author });
-
-      if (!author) {
-        author = new Author({ name: args.author, id: uuid() });
+      const authorExists = await Author.exists({ name: args.author });
+      let author;
+      if (authorExists) {
+        author = await Author.findOne({ name: args.author });
+      } else {
         try {
+          author = new Author({ name: args.author, id: uuid() });
           await author.save();
         } catch (error) {
           throw new GraphQLError("Saving author failed", {
@@ -54,7 +52,7 @@ const resolvers = {
         }
       }
 
-      const newBook = new Book({ ...args, id: uuid(), author: author._id });
+      const newBook = new Book({ ...args, id: uuid(), author: author.id });
 
       try {
         return await newBook.save();
