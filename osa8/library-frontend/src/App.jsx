@@ -6,6 +6,7 @@ import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
+import Recommendations from "./components/Recommendations";
 import Notify from "./components/Notify";
 
 const App = () => {
@@ -36,6 +37,11 @@ const App = () => {
             <button>add book</button>
           </Link>
         )}
+        {token && (
+          <Link to="/recommendations">
+            <button>recommend</button>
+          </Link>
+        )}
         {!token ? (
           <Link to="/login">
             <button>login</button>
@@ -58,7 +64,14 @@ const App = () => {
       <Routes>
         <Route path="/authors" element={<Authors setError={notify} />} />
         <Route path="/books" element={<Books />} />
-        <Route path="/add" element={<NewBook setError={notify} />} />
+        <Route
+          path="/add"
+          element={<NewBook show={!!token} setError={notify} />}
+        />
+        <Route
+          path="/recommendations"
+          element={<Recommendations show={!!token} />}
+        />
         <Route
           path="/login"
           element={<LoginForm setError={notify} setToken={setToken} />}

@@ -17,6 +17,7 @@ const typeDefs = /* GraphQL */ `
   type User {
     username: String!
     favoriteGenre: String!
+    recommendedBooks: [Book!]!
     id: ID!
   }
 

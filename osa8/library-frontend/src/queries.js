@@ -24,6 +24,21 @@ export const ALL_BOOKS = gql`
   }
 `;
 
+export const RECOMMENDATION_BOOKS = gql`
+  query {
+    me {
+      recommendedBooks {
+        title
+        author {
+          name
+        }
+        published
+        id
+      }
+    }
+  }
+`;
+
 export const ALL_BOOKS_GENRES = gql`
   query {
     allBooks {
