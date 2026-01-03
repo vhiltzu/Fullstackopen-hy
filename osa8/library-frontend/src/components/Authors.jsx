@@ -1,21 +1,12 @@
-import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-import { Link } from "react-router-dom";
 
 import SetBirthyearForm from "./SetBirthyearForm.jsx";
 
-export const ALL_AUTHORS = gql`
-  query {
-    allAuthors {
-      name
-      born
-      bookCount
-      id
-    }
-  }
-`;
+import { ALL_AUTHORS } from "../queries";
 
-const Authors = () => {
+const Authors = ({ setError }) => {
+  const isLoggedIn = localStorage.getItem("library-user-token");
+
   const result = useQuery(ALL_AUTHORS);
 
   if (result.loading) {
@@ -41,16 +32,14 @@ const Authors = () => {
           </tr>
           {authors.map((a) => (
             <tr key={a.id}>
-              <td>
-                <Link to={`/authors/${a.id}`}>{a.name}</Link>
-              </td>
+              <td>{a.name}</td>
               <td>{a.born}</td>
               <td>{a.bookCount}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <SetBirthyearForm authors={authors} />
+      {isLoggedIn && <SetBirthyearForm setError={setError} authors={authors} />}
     </div>
   );
 };

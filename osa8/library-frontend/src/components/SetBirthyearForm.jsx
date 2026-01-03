@@ -1,25 +1,17 @@
 import { useState } from "react";
-import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 
-import { ALL_AUTHORS } from "./Authors.jsx";
+import { ALL_AUTHORS, EDIT_AUTHOR } from "../queries";
 
-const EDIT_AUTHOR = gql`
-  mutation editAuthor($name: String!, $setBornTo: Int!) {
-    editAuthor(name: $name, setBornTo: $setBornTo) {
-      name
-      born
-      id
-    }
-  }
-`;
-
-const SetBirthyearForm = ({ authors }) => {
+const SetBirthyearForm = ({ authors, setError }) => {
   const [name, setName] = useState("");
   const [born, setBorn] = useState("");
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
     refetchQueries: [{ query: ALL_AUTHORS }],
+    onError: (error) => {
+      setError(error.graphQLErrors[0].message);
+    },
   });
 
   const handleSubmit = async (event) => {
