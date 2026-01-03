@@ -52,10 +52,12 @@ const BookGenres = ({ setGenre }) => {
     return null;
   }
 
-  const books = result.data.allBooks;
-  const genreSet = new Set();
-  books.forEach((b) => b.genres.forEach((g) => genreSet.add(g)));
-  const genres = Array.from(genreSet);
+  const genres = Array.from(
+    result.data.allBooks.reduce((acc, book) => {
+      book.genres.forEach((genre) => acc.add(genre));
+      return acc;
+    }, new Set())
+  );
 
   return (
     <div>
