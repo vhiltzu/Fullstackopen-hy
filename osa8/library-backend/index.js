@@ -1,4 +1,5 @@
-const { ApolloServer } = require("@apollo/server");
+const { ApolloServer, GraphQLError } = require("@apollo/server");
+const { ApolloServerErrorCode } = require("@apollo/server/errors");
 const { startStandaloneServer } = require("@apollo/server/standalone");
 const { v1: uuid } = require("uuid");
 
@@ -152,7 +153,7 @@ const resolvers = {
           `Title and author must be unique: ${args.title}`,
           {
             extensions: {
-              code: "BAD_USER_INPUT",
+              code: ApolloServerErrorCode.BAD_USER_INPUT,
               invalidArgs: [args.title, args.author],
             },
           }
