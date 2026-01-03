@@ -1,0 +1,17 @@
+{
+  "name": "library",
+  "version": "0.0.1",
+  "description": "",
+  "license": "MIT",
+  "author": "Ville Hämäläinen",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.2.0",
+    "graphql": "^16.12.0"
+  }
+}
