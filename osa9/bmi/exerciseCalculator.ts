@@ -62,11 +62,14 @@ function exerciseCalculator(dailyExerciseHours: number[], target: number): Exerc
     };
 }
 
+// Ensure this file can be run directly from command line
+// but not when imported as a module
+if (require.main === module) {
+    // Read command line arguments
+    if (process.argv.slice(2).length < 7 || process.argv.slice(2).some(isNotNumber)) {
+        console.error('Not enough arguments provided. Please provide daily exercise hours for a week and a target number of hours.');
+        process.exit(1);
+    }
 
-// Read command line arguments
-if (process.argv.slice(2).length < 7 || process.argv.slice(2).some(isNotNumber)) {
-    console.error('Not enough arguments provided. Please provide daily exercise hours for a week and a target number of hours.');
-    process.exit(1);
+    console.log(exerciseCalculator(process.argv.slice(3).map(Number), Number(process.argv[2])))
 }
-
-console.log(exerciseCalculator(process.argv.slice(3).map(Number), Number(process.argv[2])))
