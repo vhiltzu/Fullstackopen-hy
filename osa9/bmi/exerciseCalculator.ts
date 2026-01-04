@@ -33,7 +33,7 @@ function rateExerciseWeek(average: number, target: number): number {
     return 1;
 }
 
-function exerciseCalculator(dailyExerciseHours: number[], target: number): ExerciseResult {
+export function exerciseCalculator(dailyExerciseHours: number[], target: number): ExerciseResult {
     const periodLength = dailyExerciseHours.length;
 
     // Its a training day if exercise hours are greater than 0

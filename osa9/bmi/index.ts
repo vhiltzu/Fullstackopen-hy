@@ -1,6 +1,12 @@
 import express from 'express';
 import { calculateBmi } from './bmiCalculator';
+import { exerciseCalculator } from './exerciseCalculator';
 import { isNotNumber } from './utils';
+
+interface ExerciseRequestPayload {
+    daily_exercises: number[];
+    target: number;
+}
 
 const app = express();
 
@@ -26,6 +32,23 @@ app.get('/bmi', (req, res) => {
         weight: weightNum,
         bmi
     });
+});
+
+app.post('/exercises', express.json(), (req, res) => {
+    const { daily_exercises, target } = req.body as ExerciseRequestPayload;
+
+    if (!daily_exercises || !target) {
+        return res.status(400).send({ error: 'parameters missing' });
+    }
+
+    // Validate that daily_exercises is an array of numbers and target is a number
+    if (!Array.isArray(daily_exercises) || isNotNumber(target) || daily_exercises.some(isNotNumber)) {
+        return res.status(400).send({ error: 'malformatted parameters' });
+    }
+
+    const exerciseResult = exerciseCalculator(daily_exercises.map(Number), Number(target));
+
+    return res.send(exerciseResult);
 });
 
 const PORT = 3003;
