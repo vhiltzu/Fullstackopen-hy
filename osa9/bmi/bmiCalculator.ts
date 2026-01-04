@@ -26,5 +26,5 @@ if (require.main === module) {
         process.exit(1);
     }
 
-    console.log(calculateBmi(Number(process.argv[2]), Number(process.argv[3])))
+    console.log(calculateBmi(Number(process.argv[2]), Number(process.argv[3])));
 }

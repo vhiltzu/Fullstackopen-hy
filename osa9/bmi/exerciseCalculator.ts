@@ -71,5 +71,5 @@ if (require.main === module) {
         process.exit(1);
     }
 
-    console.log(exerciseCalculator(process.argv.slice(3).map(Number), Number(process.argv[2])))
+    console.log(exerciseCalculator(process.argv.slice(3).map(Number), Number(process.argv[2])));
 }
