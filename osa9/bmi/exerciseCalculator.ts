@@ -1,3 +1,5 @@
+import { isNotNumber } from './utils';
+
 interface ExerciseResult {
     periodLength: number;
     trainingDays: number;
@@ -60,4 +62,11 @@ function exerciseCalculator(dailyExerciseHours: number[], target: number): Exerc
     };
 }
 
-console.log(exerciseCalculator([3, 0, 2, 4.5, 0, 3, 1], 2))
+
+// Read command line arguments
+if (process.argv.slice(2).length < 7 || process.argv.slice(2).some(isNotNumber)) {
+    console.error('Not enough arguments provided. Please provide daily exercise hours for a week and a target number of hours.');
+    process.exit(1);
+}
+
+console.log(exerciseCalculator(process.argv.slice(3).map(Number), Number(process.argv[2])))

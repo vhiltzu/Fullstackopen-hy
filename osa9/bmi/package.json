@@ -4,11 +4,11 @@
   "description": "",
   "license": "MIT",
   "author": "Ville Hämäläinen",
-  "type": "commonjs",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
+    "ts-node": "ts-node",
     "calculateBmi": "ts-node bmiCalculator.ts",
-    "exerciseCalculator": "ts-node exerciseCalculator.ts"
+    "calculateExercises": "ts-node exerciseCalculator.ts"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
