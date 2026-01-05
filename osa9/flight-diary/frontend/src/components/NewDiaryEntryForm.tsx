@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { NewDiaryEntry, Visibility, Weather } from "../types";
+import ErrorNotification from "./ErrorNotification";
 
 interface NewDiaryEntryFormProps {
   onSubmit: (data: NewDiaryEntry) => void;
+  error?: string;
 }
 
-const NewDiaryEntryForm = ({ onSubmit }: NewDiaryEntryFormProps) => {
+const NewDiaryEntryForm = ({ onSubmit, error }: NewDiaryEntryFormProps) => {
   const [date, setDate] = useState("");
   const [weather, setWeather] = useState("");
   const [visibility, setVisibility] = useState("");
@@ -28,6 +30,7 @@ const NewDiaryEntryForm = ({ onSubmit }: NewDiaryEntryFormProps) => {
   return (
     <div>
       <h2>Add new diary entry</h2>
+      <ErrorNotification message={error} />
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="date">Date</label>
