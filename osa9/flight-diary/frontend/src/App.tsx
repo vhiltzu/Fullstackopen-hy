@@ -36,7 +36,11 @@ function App() {
 
   return (
     <div>
-      <NewDiaryEntryForm onSubmit={handleNewDiaryEntry} error={error} />
+      <NewDiaryEntryForm
+        onSubmit={handleNewDiaryEntry}
+        error={error}
+        setError={setError}
+      />
       <DiaryEntryList entries={diaries} />
     </div>
   );

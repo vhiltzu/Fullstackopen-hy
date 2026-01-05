@@ -5,9 +5,14 @@ import ErrorNotification from "./ErrorNotification";
 interface NewDiaryEntryFormProps {
   onSubmit: (data: NewDiaryEntry) => void;
   error?: string;
+  setError?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const NewDiaryEntryForm = ({ onSubmit, error }: NewDiaryEntryFormProps) => {
+const NewDiaryEntryForm = ({
+  onSubmit,
+  error,
+  setError,
+}: NewDiaryEntryFormProps) => {
   const [date, setDate] = useState<string>("");
   const [weather, setWeather] = useState<Weather | null>(null);
   const [visibility, setVisibility] = useState<Visibility | null>(null);
@@ -17,7 +22,16 @@ const NewDiaryEntryForm = ({ onSubmit, error }: NewDiaryEntryFormProps) => {
     event.preventDefault();
 
     // Do not submit if weather or visibility is not selected
-    if (weather === null || visibility === null) {
+    if (!weather) {
+      if (setError) {
+        setError("Please select weather and visibility");
+      }
+      return;
+    }
+    if (!visibility) {
+      if (setError) {
+        setError("Please select weather and visibility");
+      }
       return;
     }
 
