@@ -1,7 +1,10 @@
-import type { CoursePart } from "../types";
+interface CoursePartProps {
+  name: string;
+  exerciseCount: number;
+}
 
 interface ContentProps {
-  parts: CoursePart[];
+  parts: CoursePartProps[];
 }
 
 const Content = ({ parts }: ContentProps) => {
@@ -18,7 +21,7 @@ const Content = ({ parts }: ContentProps) => {
   );
 };
 
-const Part = ({ name, exerciseCount }: CoursePart) => {
+const Part = ({ name, exerciseCount }: CoursePartProps) => {
   return (
     <p>
       {name} {exerciseCount}
