@@ -4,7 +4,6 @@ import {
   LocalHospital as HospitalEntryIcon,
   Favorite as HealthRatingIcon,
 } from "@mui/icons-material";
-
 import {
   Diagnosis,
   Entry,
@@ -13,40 +12,33 @@ import {
   HospitalEntry,
   OccupationalHealthcareEntry,
 } from "../../types";
-import { Button } from "@mui/material";
 
 interface Props {
-  entries: Entry[];
+  entry: Entry;
   diagnoses: Diagnosis[];
 }
+
+const HealthEntry = ({ entry, diagnoses }: Props) => {
+  return (
+    <div
+      key={entry.id}
+      style={{
+        border: "1px solid black",
+        margin: "8px 0",
+        borderRadius: 4,
+        padding: 16,
+      }}
+    >
+      <EntryDetails entry={entry} diagnoses={diagnoses} />
+    </div>
+  );
+};
+
+export default HealthEntry;
 
 const assertNever = (value: never): never => {
   throw new Error(
     `Unhandled discriminated union member: ${JSON.stringify(value)}`
-  );
-};
-
-const HealthEntryList = ({ entries, diagnoses }: Props) => {
-  return (
-    <div>
-      <h3>entries</h3>
-      {entries.map((entry) => (
-        <div
-          key={entry.id}
-          style={{
-            border: "1px solid black",
-            margin: "8px 0",
-            borderRadius: 4,
-            padding: 16,
-          }}
-        >
-          <EntryDetails entry={entry} diagnoses={diagnoses} />
-        </div>
-      ))}
-      <Button variant="contained" color="primary">
-        Add New Entry
-      </Button>
-    </div>
   );
 };
 
@@ -88,6 +80,9 @@ const HospitalEntryDetails = ({
       </div>
       <div>
         <i>{entry.description}</i>
+      </div>
+      <div>
+        discharge: {entry.discharge.date} - {entry.discharge.criteria}
       </div>
       <DiagnosisList
         diagnosisCodes={entry.diagnosisCodes || []}
@@ -181,5 +176,3 @@ const DiagnosisList = ({
     </ul>
   );
 };
-
-export default HealthEntryList;
